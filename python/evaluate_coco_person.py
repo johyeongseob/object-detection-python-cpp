@@ -107,8 +107,11 @@ def evaluate(args: argparse.Namespace) -> None:
             raise ValueError("--limit must be positive")
         image_ids = image_ids[: args.limit]
     result_suffix = "" if args.limit is None else f"_{len(image_ids)}_images"
-    prediction_file = output_dir / f"coco_val2017_person_predictions{result_suffix}.json"
-    metrics_file = results_dir / f"coco_person_metrics{result_suffix}.json"
+    prediction_file = (
+        output_dir
+        / f"python_coco_val2017_person_predictions{result_suffix}.json"
+    )
+    metrics_file = results_dir / f"python_coco_person_metrics{result_suffix}.json"
     image_paths = [image_dir / f"{image_id:012d}.jpg" for image_id in image_ids]
     missing_images = [path for path in image_paths if not path.is_file()]
     if missing_images:
@@ -187,6 +190,7 @@ def evaluate(args: argparse.Namespace) -> None:
             "name": Path(model_config["path"]).stem,
             "path": str(model_config["path"]),
             "input_size": int(model_config["image_size"]),
+            "runtime": "PyTorch/Ultralytics",
         },
         "dataset": {
             "name": "COCO val2017",

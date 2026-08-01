@@ -114,10 +114,10 @@ The thresholds have distinct purposes:
 ```text
 outputs/yolo11n/
 |-- images/                                      Annotated images
-`-- coco_val2017_person_predictions.json         Raw predictions
+`-- python_coco_val2017_person_predictions.json  Raw predictions
 
 results/yolo11n/
-`-- coco_person_metrics.json                     Metrics and environment
+`-- python_coco_person_metrics.json              Metrics and environment
 ```
 
 `outputs/` is ignored by Git. Compact summaries under `results/` are tracked.

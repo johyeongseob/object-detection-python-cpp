@@ -12,3 +12,9 @@ outputs/
 
 # Downloaded model weights
 models/
+
+# CMake build artifacts
+cpp/build/
+
+# Downloaded C++ SDKs
+cpp/third_party/

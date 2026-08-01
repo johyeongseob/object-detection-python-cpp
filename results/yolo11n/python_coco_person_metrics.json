@@ -3,7 +3,8 @@
   "model": {
     "name": "yolo11n",
     "path": "models/yolo11n/yolo11n.pt",
-    "input_size": 640
+    "input_size": 640,
+    "runtime": "PyTorch/Ultralytics"
   },
   "dataset": {
     "name": "COCO val2017",

@@ -1,0 +1,96 @@
+{
+  "python_metrics": "results/yolo11n/python_coco_person_metrics.json",
+  "cpp_metrics": "results/yolo11n/cpp_coco_person_metrics.json",
+  "metrics": [
+    {
+      "metric": "ap_50_95",
+      "label": "AP50-95",
+      "python": 0.5291898508427844,
+      "cpp": 0.5338189643724379,
+      "cpp_delta": 0.004629113529653561,
+      "cpp_delta_percent": 0.8747547826703903,
+      "better": "cpp"
+    },
+    {
+      "metric": "ap_50",
+      "label": "AP50",
+      "python": 0.7679461961343294,
+      "cpp": 0.7731723015065436,
+      "cpp_delta": 0.00522610537221424,
+      "cpp_delta_percent": 0.6805301463203144,
+      "better": "cpp"
+    },
+    {
+      "metric": "ap_75",
+      "label": "AP75",
+      "python": 0.5658624391418555,
+      "cpp": 0.5698843084503826,
+      "cpp_delta": 0.004021869308527104,
+      "cpp_delta_percent": 0.7107503573883378,
+      "better": "cpp"
+    },
+    {
+      "metric": "ar_100",
+      "label": "AR100",
+      "python": 0.647619931335251,
+      "cpp": 0.6487519717917789,
+      "cpp_delta": 0.0011320404565279274,
+      "cpp_delta_percent": 0.17480012608535797,
+      "better": "cpp"
+    },
+    {
+      "metric": "predictions",
+      "label": "Predictions",
+      "python": 129074.0,
+      "cpp": 128230.0,
+      "cpp_delta": -844.0,
+      "cpp_delta_percent": -0.6538884670808993,
+      "better": "neutral"
+    },
+    {
+      "metric": "mean_inference_ms",
+      "label": "Mean inference (ms)",
+      "python": 29.50131120559636,
+      "cpp": 23.00833688,
+      "cpp_delta": -6.492974325596357,
+      "cpp_delta_percent": -22.009104206746745,
+      "better": "cpp"
+    },
+    {
+      "metric": "p50_inference_ms",
+      "label": "P50 inference (ms)",
+      "python": 28.251559500404255,
+      "cpp": 19.15732,
+      "cpp_delta": -9.094239500404257,
+      "cpp_delta_percent": -32.19022121689999,
+      "better": "cpp"
+    },
+    {
+      "metric": "p95_inference_ms",
+      "label": "P95 inference (ms)",
+      "python": 40.88574310003424,
+      "cpp": 43.3174865,
+      "cpp_delta": 2.431743399965761,
+      "cpp_delta_percent": 5.947656115766487,
+      "better": "python"
+    },
+    {
+      "metric": "throughput_images_per_second",
+      "label": "Throughput (images/s)",
+      "python": 22.943030227461165,
+      "cpp": 20.38850588,
+      "cpp_delta": -2.5545243474611645,
+      "cpp_delta_percent": -11.134206432782284,
+      "better": "python"
+    },
+    {
+      "metric": "wall_time_seconds",
+      "label": "Wall time (s)",
+      "python": 217.93110807199992,
+      "cpp": 245.2362145,
+      "cpp_delta": 27.305106428000073,
+      "cpp_delta_percent": 12.529237642832996,
+      "better": "python"
+    }
+  ]
+}

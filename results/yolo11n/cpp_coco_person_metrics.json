@@ -1,0 +1,48 @@
+{
+  "created_at_utc": "2026-08-01T13:28:46.497678+00:00",
+  "model": {
+    "name": "yolo11n",
+    "path": "models/yolo11n/yolo11n.onnx",
+    "input_size": 640,
+    "runtime": "ONNX Runtime C++"
+  },
+  "dataset": {
+    "name": "COCO val2017",
+    "images": 5000,
+    "category": "person",
+    "category_id": 1
+  },
+  "evaluation": {
+    "confidence_threshold": 0.001,
+    "nms_iou_threshold": 0.7,
+    "max_detections": 100,
+    "predictions": 128230,
+    "ap_50_95": 0.5338189643724379,
+    "ap_50": 0.7731723015065436,
+    "ap_75": 0.5698843084503826,
+    "ap_small": 0.2921105871107827,
+    "ap_medium": 0.621416038947549,
+    "ap_large": 0.7808460058424767,
+    "ar_1": 0.19511923540874082,
+    "ar_10": 0.5437969750394358,
+    "ar_100": 0.6487519717917789,
+    "ar_small": 0.44020427112349114,
+    "ar_medium": 0.7375235025517056,
+    "ar_large": 0.8560815731973779
+  },
+  "performance": {
+    "device": "cpu",
+    "warmup_iterations": 10,
+    "wall_time_seconds": 245.2362145,
+    "throughput_images_per_second": 20.38850588,
+    "mean_inference_ms": 23.00833688,
+    "p50_inference_ms": 19.15732,
+    "p95_inference_ms": 43.3174865
+  },
+  "environment": {
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+    "onnxruntime": "1.23.2",
+    "opencv_cpp": "4.5.4",
+    "pycocotools": "unknown"
+  }
+}

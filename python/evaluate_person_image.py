@@ -115,22 +115,36 @@ def match_predictions(
 def draw_box(
     image: np.ndarray,
     box: np.ndarray,
-    color: tuple[int, int, int],
-    label: str,
-    label_below: bool = False,
+    confidence: float,
 ) -> None:
-    """Draw one labeled xyxy bounding box."""
+    """Draw one person prediction in the same style as the C++ output."""
     x1, y1, x2, y2 = (int(round(value)) for value in box)
+    color = (255, 0, 0)
+    label = f"person {confidence:.2f}"
     cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
-    text_y = min(image.shape[0] - 6, y2 + 18) if label_below else max(18, y1 - 6)
+
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 0.6
+    thickness = 1
+    (text_width, text_height), _ = cv2.getTextSize(
+        label, font, font_scale, thickness
+    )
+    label_top = max(y1, text_height + 8)
+    cv2.rectangle(
+        image,
+        (x1, label_top - text_height - 8),
+        (x1 + text_width + 8, label_top),
+        color,
+        cv2.FILLED,
+    )
     cv2.putText(
         image,
         label,
-        (x1, text_y),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.5,
-        color,
-        2,
+        (x1 + 4, label_top - 4),
+        font,
+        font_scale,
+        (255, 255, 255),
+        thickness,
         cv2.LINE_AA,
     )
 
@@ -191,9 +205,6 @@ def evaluate(args: argparse.Namespace) -> None:
         ground_truth_boxes,
         match_iou_threshold,
     )
-    matched_predictions = {match.prediction_index for match in matches}
-    matched_ground_truths = {match.ground_truth_index for match in matches}
-
     true_positives = len(matches)
     false_positives = len(prediction_boxes) - true_positives
     false_negatives = len(ground_truth_boxes) - true_positives
@@ -229,23 +240,8 @@ def evaluate(args: argparse.Namespace) -> None:
     image = cv2.imread(str(image_path))
     if image is None:
         raise RuntimeError(f"Failed to read image: {image_path}")
-    for index, box in enumerate(ground_truth_boxes):
-        matched = index in matched_ground_truths
-        draw_box(
-            image,
-            box,
-            (0, 180, 0) if matched else (0, 0, 255),
-            "GT matched" if matched else "GT missed",
-        )
-    for index, (box, confidence) in enumerate(zip(prediction_boxes, confidences)):
-        matched = index in matched_predictions
-        draw_box(
-            image,
-            box,
-            (255, 100, 0) if matched else (0, 165, 255),
-            f"Pred {'TP' if matched else 'FP'} {confidence:.2f}",
-            label_below=True,
-        )
+    for box, confidence in zip(prediction_boxes, confidences):
+        draw_box(image, box, float(confidence))
 
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / f"python_{image_id}_evaluation.jpg"

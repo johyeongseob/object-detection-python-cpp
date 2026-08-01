@@ -70,7 +70,7 @@ includes image loading, preprocessing, postprocessing, and COCO conversion.
 | Ultralytics | 8.4.114 |
 
 The complete machine-readable result is available in
-[`results/yolo11n/coco_person_metrics.json`](results/yolo11n/coco_person_metrics.json).
+[`results/yolo11n/python_coco_person_metrics.json`](results/yolo11n/python_coco_person_metrics.json).
 
 ## Pipeline
 
@@ -90,6 +90,7 @@ COCO image
 |-- configs/                 Shared experiment settings
 |-- python/                  Python programs, dependencies, and documentation
 |-- cpp/                     C++17, CMake, and C++ documentation
+|-- evaluation/              Shared COCO evaluation and comparison tools
 |-- datasets/                Downloaded data and dataset utilities
 |-- models/                  Models shared by Python and C++
 |-- outputs/                 Generated images and raw predictions
