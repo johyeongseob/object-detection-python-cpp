@@ -1,25 +1,28 @@
 # Person Detection: Python to C++
 
-An end-to-end person detection project built around YOLO11n and COCO val2017.
-The Python baseline covers inference, COCO evaluation, and CPU benchmarking.
-The next phase will reproduce the same pipeline in C++ with CMake.
+An end-to-end person-detection project using YOLO11n and COCO val2017. The
+Python baseline covers inference, COCO evaluation, and CPU benchmarking. The
+next phase reproduces the pipeline in C++17 with CMake.
 
 ## Status
 
 - [x] Inspect COCO val2017 annotations
 - [x] Run YOLO11n person detection in Python
-- [x] Compare predictions with ground truth using IoU matching
 - [x] Evaluate the `person` category on all 5,000 validation images
-- [x] Record CPU latency, throughput, and environment metadata
-- [ ] Analyze and document representative failure cases
-- [ ] Add focused tests for box conversion, IoU, and matching
-- [ ] Implement the equivalent C++ inference pipeline
+- [x] Record CPU accuracy, latency, and throughput
+- [ ] Implement equivalent C++ inference with CMake
+- [ ] Evaluate all 5,000 images in C++
 - [ ] Compare Python and C++ accuracy and performance
+
+Language-specific instructions:
+
+- [Python setup and usage](python/README.md)
+- [C++ dependencies, build, and roadmap](cpp/README.md)
 
 ## Python Baseline
 
 YOLO11n was evaluated on all 5,000 COCO val2017 images. Only the `person`
-category was scored, but images without people were retained so that false
+category was scored, while images without people were retained so false
 positives remained part of the evaluation.
 
 ### Accuracy
@@ -44,9 +47,8 @@ positives remained part of the evaluation.
 | End-to-end throughput | 22.94 images/s |
 | Total prediction time | 217.93 s |
 
-The model averaged approximately 33.9 FPS for inference alone. End-to-end
-throughput also includes image loading, preprocessing, postprocessing, and
-conversion to COCO prediction records.
+Inference alone averaged approximately 33.9 FPS. End-to-end throughput also
+includes image loading, preprocessing, postprocessing, and COCO conversion.
 
 ### Evaluation Environment
 
@@ -67,17 +69,16 @@ conversion to COCO prediction records.
 | PyTorch | 2.13.0+cpu |
 | Ultralytics | 8.4.114 |
 
-The complete machine-readable result is available at
+The complete machine-readable result is available in
 [`results/yolo11n/coco_person_metrics.json`](results/yolo11n/coco_person_metrics.json).
 
 ## Pipeline
 
 ```text
 COCO image
-  -> resize and preprocess
+  -> preprocess
   -> YOLO11n inference
-  -> person-class filtering
-  -> confidence filtering and NMS
+  -> person filtering and NMS
   -> COCO-format predictions
   -> COCOeval metrics and runtime summary
 ```
@@ -86,104 +87,57 @@ COCO image
 
 ```text
 .
-|-- configs/                 Reproducible model and evaluation settings
-|-- python/                  Python inference and evaluation programs
-|-- cpp/                     Planned C++ and CMake implementation
+|-- configs/                 Shared experiment settings
+|-- python/                  Python programs, dependencies, and documentation
+|-- cpp/                     C++17, CMake, and C++ documentation
 |-- datasets/                Downloaded data and dataset utilities
-|-- models/                  Downloaded model weights
+|-- models/                  Models shared by Python and C++
 |-- outputs/                 Generated images and raw predictions
-|-- results/                 Small evaluation summaries tracked by Git
+|-- results/                 Compact evaluation summaries tracked by Git
 |-- .gitignore
 `-- README.md
 ```
 
-Downloaded datasets, model weights, and generated outputs are intentionally
-excluded from Git. Python and C++ will share the same `datasets/`, `models/`,
-and `outputs/` structure.
+Datasets, model weights, and generated outputs are excluded from Git. Python
+and C++ share the same `configs/`, `datasets/`, `models/`, and `outputs/`
+directories to support fair comparisons.
 
-## Setup
+## Common Data and Model Setup
 
-The project is tested in Ubuntu 22.04 through WSL 2.
-
-### 1. Install System Packages
-
-```bash
-sudo apt update
-sudo apt install -y python3-venv python3-pip git wget unzip
-```
-
-### 2. Clone the Repository
+The project is developed in WSL 2 with Ubuntu 22.04. Clone the repository and
+enter it from WSL:
 
 ```bash
 git clone https://github.com/johyeongseob/object-detection-python-cpp.git
 cd object-detection-python-cpp
 ```
 
-When working from an existing Windows checkout, open it from WSL instead:
+For a repository stored on the Windows filesystem:
 
 ```bash
 cd /mnt/c/Users/YOUR_WINDOWS_USERNAME/PATH_TO_PROJECT
 ```
 
-### 3. Create the Python Environment
+Download COCO val2017 images and annotations:
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r python/requirements.txt
-```
-
-Confirm that the CPU build of PyTorch is active:
-
-```bash
-python -c "import torch; print(torch.__version__); print('CUDA:', torch.cuda.is_available())"
-```
-
-`CUDA: False` is expected for the documented CPU baseline.
-
-## Prepare COCO val2017
-
-Download the 5,000 validation images and the instance annotations from the
-official COCO storage bucket:
-
-```bash
+sudo apt update
+sudo apt install -y wget unzip
 mkdir -p datasets/coco
 wget -c -P datasets/coco \
   https://s3.amazonaws.com/images.cocodataset.org/zips/val2017.zip
 wget -c -P datasets/coco \
   https://s3.amazonaws.com/images.cocodataset.org/annotations/annotations_trainval2017.zip
-
 unzip -q datasets/coco/val2017.zip -d datasets/coco
 unzip -q datasets/coco/annotations_trainval2017.zip -d datasets/coco
 ```
 
-Verify the dataset:
+### Download YOLO11n
 
-```bash
-find datasets/coco/val2017 -maxdepth 1 -type f -name '*.jpg' | wc -l
-test -f datasets/coco/annotations/instances_val2017.json && echo "annotations OK"
-```
-
-Expected output:
-
-```text
-5000
-annotations OK
-```
-
-An optional person-image subset can be created for quick inspection. It must
-not replace the full 5,000-image set during formal evaluation because images
-without people are required to measure false positives.
-
-```bash
-python datasets/coco/create_person_subset.py
-```
-
-## Download YOLO11n
-
-Model weights are not tracked by Git. Download the official Ultralytics
-YOLO11n weights after installing the Python dependencies:
+YOLO11n is a common project asset shared by Python and C++. Model files are
+ignored by Git. After installing the Python dependencies described in
+[`python/README.md`](python/README.md), download the official Ultralytics
+weights from the repository root:
 
 ```bash
 mkdir -p models/yolo11n
@@ -191,115 +145,41 @@ mkdir -p models/yolo11n
   cd models/yolo11n
   python -c "from ultralytics import YOLO; YOLO('yolo11n.pt')"
 )
-```
-
-Verify the configured model path:
-
-```bash
 ls -lh models/yolo11n/yolo11n.pt
 ```
 
-## Usage
+The shared model locations are:
 
-All commands below run from the repository root with `.venv` activated.
-
-### Inspect COCO Annotations
-
-```bash
-python python/inspect_coco.py --image-id 139
+```text
+models/yolo11n/yolo11n.pt      Python model
+models/yolo11n/yolo11n.onnx    C++ deployment model (planned)
 ```
 
-This prints dataset statistics and the ground-truth objects stored in COCO's
-`[x, y, width, height]` box format.
+The ONNX artifact will be added when the C++ pipeline is implemented.
 
-### Detect People in One Image
+## Configuration and Artifacts
 
-```bash
-python python/detect_person.py --image-id 139
-```
-
-Override YAML settings for a one-off experiment:
-
-```bash
-python python/detect_person.py --image-id 139 --confidence 0.50
-```
-
-The annotated image is written to `outputs/yolo11n/images/`.
-
-### Evaluate One Image
-
-```bash
-python python/evaluate_person_image.py --image-id 139
-```
-
-This converts COCO boxes from `xywh` to `xyxy`, greedily matches predictions
-to unique ground truths, and reports IoU, TP, FP, FN, precision, and recall.
-
-### Smoke-Test the Full Evaluation Pipeline
-
-```bash
-python -u python/evaluate_coco_person.py --limit 10
-```
-
-Smoke-test artifacts use a `_10_images` suffix and do not overwrite full
-evaluation results.
-
-### Evaluate All 5,000 Images
-
-```bash
-python -u python/evaluate_coco_person.py
-```
-
-The full evaluation processes one image at a time for predictable memory use.
-It uses a low confidence threshold (`0.001`) so COCOeval can construct the
-precision-recall curve.
-
-## Configuration
-
-The default experiment is defined in
+Shared settings are stored in
 [`configs/yolo11/person_detection.yaml`](configs/yolo11/person_detection.yaml).
-It contains model, device, image size, detection thresholds, dataset paths,
-output paths, and evaluation settings.
-
-Command-line values override YAML values where supported:
+Generated files follow this layout:
 
 ```text
-CLI option > YAML configuration
+outputs/yolo11n/               Large, reproducible artifacts ignored by Git
+results/yolo11n/               Compact metric summaries tracked by Git
 ```
 
-The detection and evaluation confidence thresholds intentionally differ:
-
-- `0.25` is used for readable single-image visualizations.
-- `0.001` is used to collect candidates for COCO AP evaluation.
-
-The NMS IoU threshold and ground-truth matching IoU threshold also serve
-different purposes and are stored separately.
-
-## Generated Artifacts
-
-```text
-outputs/yolo11n/
-|-- images/                                      Annotated result images
-`-- coco_val2017_person_predictions.json         Raw COCO predictions
-
-results/yolo11n/
-`-- coco_person_metrics.json                     Accuracy and runtime summary
-```
-
-`outputs/` is ignored by Git because these files are large or reproducible.
-Compact JSON summaries under `results/` are tracked for comparison across
-models, runtimes, and languages.
+The Python and C++ evaluations will use the same dataset, input size,
+thresholds, batch size, and COCO evaluator wherever possible.
 
 ## Key Finding
 
-Object scale is the clearest current failure mode. AP falls from `0.7779` for
-large people to `0.2858` for small people. The next Python milestone is to
-create a reproducible failure-case gallery and test the box and matching
-utilities before starting the C++ implementation.
+Object scale is the clearest weakness in the Python baseline. AP falls from
+`0.7779` for large people to `0.2858` for small people. The next milestone is
+to reproduce the pipeline in C++ and measure accuracy parity and runtime.
 
 ## Citation
 
-This project uses Ultralytics YOLO11. Please cite the original software as:
+This project uses Ultralytics YOLO11:
 
 ```bibtex
 @software{yolo11_ultralytics,
