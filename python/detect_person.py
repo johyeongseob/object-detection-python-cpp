@@ -10,9 +10,11 @@ import cv2
 import yaml
 from ultralytics import YOLO
 
+from visualization import draw_person_detection
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_CONFIG = PROJECT_ROOT / "configs" / "yolo11" / "person_detection.yaml"
+DEFAULT_CONFIG = PROJECT_ROOT / "configs" / "yolo11n" / "person_detection.yaml"
 
 
 @dataclass(frozen=True)
@@ -79,6 +81,7 @@ def resolve_config(args: argparse.Namespace) -> DetectionConfig:
     data = load_yaml(args.config)
     try:
         model = data["model"]
+        runtime = data["runtime"]["python"]
         detection = data["detection"]
         dataset = data["data"]
         output = data["output"]
@@ -86,8 +89,8 @@ def resolve_config(args: argparse.Namespace) -> DetectionConfig:
         raise ValueError(f"Missing configuration section: {error.args[0]}") from error
 
     config = DetectionConfig(
-        model_path=project_path(args.model or model["path"]),
-        device=args.device or str(model["device"]),
+        model_path=project_path(args.model or model["paths"]["python"]),
+        device=args.device or str(runtime["device"]),
         image_size=(
             args.image_size
             if args.image_size is not None
@@ -178,10 +181,10 @@ def detect_people(config: DetectionConfig) -> None:
     if config.save_image:
         config.output_dir.mkdir(parents=True, exist_ok=True)
         output_path = config.output_dir / f"python_{config.image_id}_person.jpg"
-        plotted = result.plot(
-            labels=config.show_labels,
-            conf=config.show_confidence,
-        )
+        plotted = result.orig_img.copy()
+        if boxes is not None:
+            for bbox, confidence in zip(coordinates, confidences):
+                draw_person_detection(plotted, bbox, float(confidence))
         if not cv2.imwrite(str(output_path), plotted):
             raise RuntimeError(f"Failed to save output image: {output_path}")
         print(f"\nSaved: {output_path}")

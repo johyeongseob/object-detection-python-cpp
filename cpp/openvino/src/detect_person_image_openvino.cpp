@@ -1,14 +1,11 @@
 #include "openvino_person_detector.hpp"
+#include "person_visualization.hpp"
 
 #include <opencv2/imgcodecs.hpp>
-#include <opencv2/imgproc.hpp>
 
-#include <algorithm>
-#include <cmath>
 #include <filesystem>
 #include <iomanip>
 #include <iostream>
-#include <sstream>
 #include <string>
 
 namespace {
@@ -18,41 +15,6 @@ constexpr float kConfidenceThreshold = 0.25F;
 constexpr float kNmsIouThreshold = 0.70F;
 constexpr int kMaxDetections = 100;
 constexpr const char* kDevice = "GPU";
-
-void draw_detection(cv::Mat& image, const OpenVinoDetection& detection) {
-    const cv::Scalar color{255, 0, 0};
-    const cv::Rect integer_box{
-        static_cast<int>(std::round(detection.box.x)),
-        static_cast<int>(std::round(detection.box.y)),
-        static_cast<int>(std::round(detection.box.width)),
-        static_cast<int>(std::round(detection.box.height))};
-    cv::rectangle(image, integer_box, color, 2);
-
-    std::ostringstream label_stream;
-    label_stream << "person " << std::fixed << std::setprecision(2)
-                 << detection.confidence;
-    const std::string label = label_stream.str();
-
-    int baseline = 0;
-    const cv::Size text_size = cv::getTextSize(
-        label, cv::FONT_HERSHEY_SIMPLEX, 0.6, 1, &baseline);
-    const int label_top = std::max(integer_box.y, text_size.height + 8);
-    const cv::Rect background{
-        integer_box.x,
-        label_top - text_size.height - 8,
-        text_size.width + 8,
-        text_size.height + 8};
-    cv::rectangle(image, background, color, cv::FILLED);
-    cv::putText(
-        image,
-        label,
-        cv::Point(integer_box.x + 4, label_top - 4),
-        cv::FONT_HERSHEY_SIMPLEX,
-        0.6,
-        cv::Scalar{255, 255, 255},
-        1,
-        cv::LINE_AA);
-}
 
 }  // namespace
 
@@ -88,7 +50,8 @@ int main(int argc, char* argv[]) {
         const OpenVinoDetectionResult result = detector.detect(image);
 
         for (const OpenVinoDetection& detection : result.detections) {
-            draw_detection(image, detection);
+            draw_person_detection(
+                image, detection.box, detection.confidence);
         }
 
         if (!output_path.parent_path().empty()) {

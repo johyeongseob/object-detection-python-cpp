@@ -11,9 +11,11 @@ import yaml
 from pycocotools.coco import COCO
 from ultralytics import YOLO
 
+from visualization import draw_person_detection
+
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_CONFIG = PROJECT_ROOT / "configs" / "yolo11" / "person_detection.yaml"
+DEFAULT_CONFIG = PROJECT_ROOT / "configs" / "yolo11n" / "person_detection.yaml"
 COCO_PERSON_CATEGORY_ID = 1
 
 
@@ -112,47 +114,11 @@ def match_predictions(
     return matches
 
 
-def draw_box(
-    image: np.ndarray,
-    box: np.ndarray,
-    confidence: float,
-) -> None:
-    """Draw one person prediction in the same style as the C++ output."""
-    x1, y1, x2, y2 = (int(round(value)) for value in box)
-    color = (255, 0, 0)
-    label = f"person {confidence:.2f}"
-    cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
-
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    font_scale = 0.6
-    thickness = 1
-    (text_width, text_height), _ = cv2.getTextSize(
-        label, font, font_scale, thickness
-    )
-    label_top = max(y1, text_height + 8)
-    cv2.rectangle(
-        image,
-        (x1, label_top - text_height - 8),
-        (x1 + text_width + 8, label_top),
-        color,
-        cv2.FILLED,
-    )
-    cv2.putText(
-        image,
-        label,
-        (x1 + 4, label_top - 4),
-        font,
-        font_scale,
-        (255, 255, 255),
-        thickness,
-        cv2.LINE_AA,
-    )
-
-
 def evaluate(args: argparse.Namespace) -> None:
     """Run inference, matching, metrics, and visualization for one image."""
     config = load_config(args.config)
     model_config = config["model"]
+    runtime_config = config["runtime"]["python"]
     detection_config = config["detection"]
     data_config = config["data"]
     output_config = config["output"]
@@ -186,14 +152,14 @@ def evaluate(args: argparse.Namespace) -> None:
         dtype=np.float32,
     ).reshape(-1, 4)
 
-    model = YOLO(str(project_path(model_config["path"])))
+    model = YOLO(str(project_path(model_config["paths"]["python"])))
     result = model.predict(
         source=str(image_path),
         conf=confidence_threshold,
         iou=float(detection_config["nms_iou_threshold"]),
         imgsz=int(model_config["image_size"]),
         classes=[int(detection_config["class_id"])],
-        device=str(model_config["device"]),
+        device=str(runtime_config["device"]),
         verbose=False,
     )[0]
     prediction_boxes = result.boxes.xyxy.cpu().numpy()
@@ -241,7 +207,7 @@ def evaluate(args: argparse.Namespace) -> None:
     if image is None:
         raise RuntimeError(f"Failed to read image: {image_path}")
     for box, confidence in zip(prediction_boxes, confidences):
-        draw_box(image, box, float(confidence))
+        draw_person_detection(image, box, float(confidence))
 
     output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / f"python_{image_id}_evaluation.jpg"

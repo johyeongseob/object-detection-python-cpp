@@ -3,20 +3,6 @@
 This directory contains the OpenVINO C++ implementation targeting the Intel
 Arc B390 integrated GPU on Ubuntu 24.04 under WSL 2.
 
-## Goal
-
-Compare three person-detection runtimes under aligned COCO val2017 settings:
-
-```text
-Python + PyTorch/Ultralytics + CPU
-C++ + ONNX Runtime + CPU
-C++ + OpenVINO + Intel iGPU
-```
-
-The OpenVINO implementation will reuse the same YOLO11n ONNX model, image
-size, confidence threshold, NMS threshold, maximum detections, warm-up count,
-preprocessing, postprocessing, and COCOeval implementation.
-
 ## Environment
 
 - WSL 2

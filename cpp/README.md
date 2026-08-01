@@ -153,7 +153,7 @@ models/yolo11n/yolo11n.pt
 models/yolo11n/yolo11n.onnx
 datasets/coco/val2017/
 datasets/coco/annotations/instances_val2017.json
-configs/yolo11/person_detection.yaml
+configs/yolo11n/person_detection.yaml
 ```
 
 The initial C++ milestone will load one image, run person-only inference, and

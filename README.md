@@ -29,17 +29,6 @@ inference latency by approximately 74.8% relative to C++ CPU inference. The
 complete machine-readable comparison is available in
 [`results/yolo11n/python_cpp_openvino_comparison.json`](results/yolo11n/python_cpp_openvino_comparison.json).
 
-## Pipeline
-
-```text
-COCO image
-  -> preprocess
-  -> YOLO11n inference
-  -> person filtering and NMS
-  -> COCO-format predictions
-  -> COCOeval metrics and runtime summary
-```
-
 ## Repository Layout
 
 ```text
@@ -114,6 +103,25 @@ models/yolo11n/yolo11n.pt      Python model
 models/yolo11n/yolo11n.onnx    ONNX Runtime C++ model
 models/yolo11n/openvino/       OpenVINO IR model and metadata
 ```
+
+## Configuration
+
+All runtimes share one configuration file. Backend-specific model paths and
+devices are stored alongside the common dataset and evaluation settings.
+
+```text
+configs/yolo11n/person_detection.yaml
+```
+
+The shared keys define the model and dataset paths, input size, detection and
+evaluation thresholds, maximum detections, and output directories.
+
+| Setting | Value | Purpose |
+| --- | ---: | --- |
+| Detection confidence | 0.25 | Single-image visualization |
+| Evaluation confidence | 0.001 | COCO precision-recall evaluation |
+| NMS IoU | 0.70 | Suppression among model predictions |
+| Match IoU | 0.50 | Single-image prediction-to-ground-truth matching |
 
 ## Citation
 

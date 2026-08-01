@@ -18,7 +18,7 @@ from ultralytics import YOLO
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_CONFIG = PROJECT_ROOT / "configs" / "yolo11" / "person_detection.yaml"
+DEFAULT_CONFIG = PROJECT_ROOT / "configs" / "yolo11n" / "person_detection.yaml"
 COCO_PERSON_CATEGORY_ID = 1
 
 
@@ -77,6 +77,7 @@ def evaluate(args: argparse.Namespace) -> None:
     """Run full-dataset inference and official COCO person evaluation."""
     config = load_config(args.config)
     model_config = config["model"]
+    runtime_config = config["runtime"]["python"]
     detection_config = config["detection"]
     data_config = config["data"]
     output_config = config["output"]
@@ -123,9 +124,9 @@ def evaluate(args: argparse.Namespace) -> None:
     print(f"  Confidence threshold: {confidence_threshold}", flush=True)
     print(f"  NMS IoU threshold:    {detection_config['nms_iou_threshold']}", flush=True)
     print(f"  Input size:           {model_config['image_size']}", flush=True)
-    print(f"  Device:               {model_config['device']}", flush=True)
+    print(f"  Device:               {runtime_config['device']}", flush=True)
 
-    model = YOLO(str(project_path(model_config["path"])))
+    model = YOLO(str(project_path(model_config["paths"]["python"])))
     predictions: list[dict[str, int | float | list[float]]] = []
     inference_times: list[float] = []
     start = time.perf_counter()
@@ -139,7 +140,7 @@ def evaluate(args: argparse.Namespace) -> None:
             imgsz=int(model_config["image_size"]),
             classes=[int(detection_config["class_id"])],
             max_det=int(evaluation_config["max_detections"]),
-            device=str(model_config["device"]),
+            device=str(runtime_config["device"]),
             verbose=False,
         )[0]
         boxes = result.boxes
@@ -187,8 +188,8 @@ def evaluate(args: argparse.Namespace) -> None:
     metrics = {
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "model": {
-            "name": Path(model_config["path"]).stem,
-            "path": str(model_config["path"]),
+            "name": str(model_config["name"]),
+            "path": str(model_config["paths"]["python"]),
             "input_size": int(model_config["image_size"]),
             "runtime": "PyTorch/Ultralytics",
         },
@@ -217,7 +218,7 @@ def evaluate(args: argparse.Namespace) -> None:
             "ar_large": float(stats[11]),
         },
         "performance": {
-            "device": str(model_config["device"]),
+            "device": str(runtime_config["device"]),
             "wall_time_seconds": elapsed,
             "throughput_images_per_second": len(image_paths) / elapsed,
             "mean_inference_ms": float(np.mean(inference_times)),

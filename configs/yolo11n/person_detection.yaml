@@ -1,7 +1,18 @@
 model:
-  path: models/yolo11n/yolo11n.pt
-  device: cpu
+  name: yolo11n
   image_size: 640
+  paths:
+    python: models/yolo11n/yolo11n.pt
+    cpp: models/yolo11n/yolo11n.onnx
+    openvino: models/yolo11n/openvino/yolo11n.xml
+
+runtime:
+  python:
+    device: cpu
+  cpp:
+    device: cpu
+  openvino:
+    device: GPU
 
 detection:
   class_id: 0

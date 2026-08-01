@@ -9,6 +9,24 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(OpenVINO REQUIRED COMPONENTS Runtime)
 find_package(OpenCV REQUIRED COMPONENTS core imgcodecs imgproc dnn)
 
+add_library(person_visualization STATIC
+    ../common/src/person_visualization.cpp
+)
+
+target_include_directories(person_visualization PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/../common/include"
+)
+
+target_link_libraries(person_visualization PUBLIC
+    ${OpenCV_LIBS}
+)
+
+target_compile_options(person_visualization PRIVATE
+    -Wall
+    -Wextra
+    -Wpedantic
+)
+
 add_executable(list_openvino_devices
     src/list_openvino_devices.cpp
 )
@@ -48,6 +66,7 @@ add_executable(detect_person_image_openvino
 
 target_link_libraries(detect_person_image_openvino PRIVATE
     openvino_person_detector
+    person_visualization
 )
 
 target_compile_options(detect_person_image_openvino PRIVATE

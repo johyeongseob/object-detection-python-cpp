@@ -29,6 +29,24 @@ set_target_properties(onnxruntime PROPERTIES
 
 find_package(OpenCV REQUIRED COMPONENTS core imgcodecs imgproc dnn)
 
+add_library(person_visualization STATIC
+    common/src/person_visualization.cpp
+)
+
+target_include_directories(person_visualization PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/common/include"
+)
+
+target_link_libraries(person_visualization PUBLIC
+    ${OpenCV_LIBS}
+)
+
+target_compile_options(person_visualization PRIVATE
+    -Wall
+    -Wextra
+    -Wpedantic
+)
+
 add_library(person_detector STATIC
     src/person_detector.cpp
 )
@@ -52,7 +70,10 @@ add_executable(detect_person_image
     src/detect_person_image.cpp
 )
 
-target_link_libraries(detect_person_image PRIVATE person_detector)
+target_link_libraries(detect_person_image PRIVATE
+    person_detector
+    person_visualization
+)
 
 target_compile_options(detect_person_image PRIVATE
     -Wall
