@@ -16,21 +16,13 @@ All implementations evaluated the COCO val2017 `person` category over 5,000
 images with an input size of 640, batch size 1, confidence threshold 0.001,
 NMS IoU threshold 0.70, and at most 100 detections per image.
 
-The delta column is calculated as `OpenVINO iGPU - Python CPU`. Negative
-latency and wall-time deltas are improvements.
+The `Δ` column shows the absolute accuracy difference and the latency ratio of
+OpenVINO iGPU relative to Python CPU.
 
-| Metric | Python CPU | C++ CPU | OpenVINO iGPU | OpenVINO delta vs Python |
+| Metric | Python CPU | C++ CPU | OpenVINO iGPU | Δ (OpenVINO/Python) |
 | --- | ---: | ---: | ---: | ---: |
-| AP50-95 | 0.5292 | 0.5338 | 0.5338 | +0.0046 |
-| AP50 | 0.7679 | 0.7732 | 0.7728 | +0.0049 |
-| AP75 | 0.5659 | 0.5699 | 0.5695 | +0.0036 |
-| AR100 | 0.6476 | 0.6488 | 0.6488 | +0.0012 |
-| Predictions | 129,074 | 128,230 | 128,052 | -1,022 |
-| Mean model inference | 29.50 ms | 23.01 ms | 5.79 ms | -23.71 ms (-80.4%, 5.10x faster) |
-| P50 model inference | 28.25 ms | 19.16 ms | 5.75 ms | -22.50 ms (-79.7%, 4.92x faster) |
-| P95 model inference | 40.89 ms | 43.32 ms | 6.08 ms | -34.80 ms (-85.1%, 6.72x faster) |
-| End-to-end throughput | 22.94 images/s | 20.39 images/s | 47.69 images/s | +24.75 images/s (+107.9%, 2.08x) |
-| Total prediction time | 217.93 s | 245.24 s | 104.84 s | -113.09 s (-51.9%, 2.08x faster) |
+| Person mAP@0.50:0.95 | 0.5292 | 0.5338 | 0.5338 | +0.0046 |
+| Avg. latency | 29.50 ms | 23.01 ms | 5.79 ms | 5.10x |
 
 OpenVINO retained accuracy parity with ONNX Runtime while reducing mean model
 inference latency by approximately 74.8% relative to C++ CPU inference. The
@@ -122,28 +114,6 @@ models/yolo11n/yolo11n.pt      Python model
 models/yolo11n/yolo11n.onnx    ONNX Runtime C++ model
 models/yolo11n/openvino/       OpenVINO IR model and metadata
 ```
-
-## Configuration and Artifacts
-
-Shared settings are stored in
-[`configs/yolo11/person_detection.yaml`](configs/yolo11/person_detection.yaml).
-Generated files follow this layout:
-
-```text
-outputs/yolo11n/               Large, reproducible artifacts ignored by Git
-results/yolo11n/               Compact metric summaries tracked by Git
-```
-
-The Python, C++ CPU, and OpenVINO iGPU evaluations use the same dataset, input
-size, thresholds, batch size, and COCO evaluator wherever possible.
-
-## Key Finding
-
-Object scale remains the clearest accuracy weakness: the Python baseline falls
-from `0.7779` AP for large people to `0.2858` AP for small people. OpenVINO
-iGPU preserves the C++ CPU accuracy (`0.5338` AP50-95) while improving mean
-model inference from `23.01 ms` to `5.79 ms` and end-to-end throughput from
-`20.39` to `47.69` images/s.
 
 ## Citation
 
