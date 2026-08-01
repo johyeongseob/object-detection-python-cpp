@@ -1,5 +1,11 @@
 # Python virtual environment
 .venv/
 
-# Downloaded datasets
-datasets/
+# Downloaded COCO dataset files
+datasets/coco/val2017/
+datasets/coco/val2017_person/
+datasets/coco/annotations/
+datasets/coco/*.zip
+
+# Generated inference outputs
+outputs/
