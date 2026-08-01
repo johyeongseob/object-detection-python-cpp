@@ -14,7 +14,7 @@ DEFAULT_CPP_METRICS = (
     PROJECT_ROOT / "results/yolo11n/cpp_coco_person_metrics.json"
 )
 DEFAULT_OUTPUT = (
-    PROJECT_ROOT / "results/yolo11n/python_vs_cpp_comparison.json"
+    PROJECT_ROOT / "results/yolo11n/python_cpp_comparison.json"
 )
 
 METRICS = (

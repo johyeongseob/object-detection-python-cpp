@@ -4,6 +4,10 @@ This directory contains the C++17 and CMake implementation of the Python
 person-detection baseline. The current first milestone verifies that ONNX
 Runtime C++ can load and execute the exported YOLO11n ONNX model.
 
+The next backend is OpenVINO on the Intel Arc B390 integrated GPU. Its setup
+and implementation plan are documented in
+[`openvino/README.md`](openvino/README.md).
+
 ## Planned Stack
 
 - C++17
@@ -59,6 +63,8 @@ cpp/
 |-- CMakeLists.txt
 |-- include/
 |   `-- person_detector.hpp
+|-- openvino/
+|   `-- README.md
 |-- src/
 |   |-- detect_person_image.cpp
 |   |-- evaluate_coco_person.cpp

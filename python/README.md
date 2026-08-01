@@ -89,6 +89,59 @@ Images are processed one at a time to keep memory usage predictable. The
 evaluation confidence is `0.001`, allowing COCOeval to construct a
 precision-recall curve.
 
+## Evaluation Results
+
+YOLO11n was evaluated on all 5,000 COCO val2017 images. Only the `person`
+category was scored, while images without people were retained so false
+positives remained part of the evaluation.
+
+### Accuracy
+
+| Metric | Result |
+| --- | ---: |
+| AP50-95 | 0.5292 |
+| AP50 | 0.7679 |
+| AP75 | 0.5659 |
+| AP small | 0.2858 |
+| AP medium | 0.6172 |
+| AP large | 0.7779 |
+| AR100 | 0.6476 |
+
+### Runtime Performance
+
+| Metric | Result |
+| --- | ---: |
+| Mean model inference | 29.50 ms |
+| P50 model inference | 28.25 ms |
+| P95 model inference | 40.89 ms |
+| End-to-end throughput | 22.94 images/s |
+| Total prediction time | 217.93 s |
+
+Inference alone averaged approximately 33.9 FPS. End-to-end throughput also
+includes image loading, preprocessing, postprocessing, and COCO conversion.
+
+### Evaluation Environment
+
+| Setting | Value |
+| --- | --- |
+| Model | YOLO11n |
+| Dataset | COCO val2017, 5,000 images |
+| Category | person |
+| Input size | 640 |
+| Batch size | 1 |
+| Evaluation confidence | 0.001 |
+| NMS IoU threshold | 0.70 |
+| Maximum detections | 100 per image |
+| Device | CPU |
+| CPU | Intel Core Ultra X7 358H |
+| Environment | WSL 2, Ubuntu 22.04 |
+| Python | 3.10.12 |
+| PyTorch | 2.13.0+cpu |
+| Ultralytics | 8.4.114 |
+
+The complete machine-readable result is available in
+[`../results/yolo11n/python_coco_person_metrics.json`](../results/yolo11n/python_coco_person_metrics.json).
+
 ## Configuration
 
 Defaults are read from
@@ -121,5 +174,4 @@ results/yolo11n/
 ```
 
 `outputs/` is ignored by Git. Compact summaries under `results/` are tracked.
-The root [README](../README.md) contains the baseline results and project-wide
-Python-to-C++ comparison plan.
+The root [README](../README.md) contains the project-wide runtime comparison.

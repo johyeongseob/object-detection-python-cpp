@@ -1,0 +1,85 @@
+{
+  "inputs": {
+    "python_cpu": "results/yolo11n/python_coco_person_metrics.json",
+    "cpp_cpu": "results/yolo11n/cpp_coco_person_metrics.json",
+    "openvino_gpu": "results/yolo11n/openvino_gpu_coco_person_metrics.json"
+  },
+  "metrics": [
+    {
+      "metric": "ap_50_95",
+      "label": "AP50-95",
+      "python_cpu": 0.5291898508427844,
+      "cpp_cpu": 0.5338189643724379,
+      "openvino_gpu": 0.5338314798575072
+    },
+    {
+      "metric": "ap_50",
+      "label": "AP50",
+      "python_cpu": 0.7679461961343294,
+      "cpp_cpu": 0.7731723015065436,
+      "openvino_gpu": 0.7728380618304307
+    },
+    {
+      "metric": "ap_75",
+      "label": "AP75",
+      "python_cpu": 0.5658624391418555,
+      "cpp_cpu": 0.5698843084503826,
+      "openvino_gpu": 0.569490318184767
+    },
+    {
+      "metric": "ar_100",
+      "label": "AR100",
+      "python_cpu": 0.647619931335251,
+      "cpp_cpu": 0.6487519717917789,
+      "openvino_gpu": 0.6487705298320496
+    },
+    {
+      "metric": "predictions",
+      "label": "Predictions",
+      "python_cpu": 129074.0,
+      "cpp_cpu": 128230.0,
+      "openvino_gpu": 128052.0
+    },
+    {
+      "metric": "mean_inference_ms",
+      "label": "Mean inference (ms)",
+      "python_cpu": 29.50131120559636,
+      "cpp_cpu": 23.00833688,
+      "openvino_gpu": 5.789526768
+    },
+    {
+      "metric": "p50_inference_ms",
+      "label": "P50 inference (ms)",
+      "python_cpu": 28.251559500404255,
+      "cpp_cpu": 19.15732,
+      "openvino_gpu": 5.7474565
+    },
+    {
+      "metric": "p95_inference_ms",
+      "label": "P95 inference (ms)",
+      "python_cpu": 40.88574310003424,
+      "cpp_cpu": 43.3174865,
+      "openvino_gpu": 6.0845004
+    },
+    {
+      "metric": "throughput_images_per_second",
+      "label": "Throughput (images/s)",
+      "python_cpu": 22.943030227461165,
+      "cpp_cpu": 20.38850588,
+      "openvino_gpu": 47.6914368
+    },
+    {
+      "metric": "wall_time_seconds",
+      "label": "Wall time (s)",
+      "python_cpu": 217.93110807199992,
+      "cpp_cpu": 245.2362145,
+      "openvino_gpu": 104.8406241
+    }
+  ],
+  "speedups": {
+    "openvino_inference_vs_python": 5.095634304457604,
+    "openvino_inference_vs_cpp": 3.9741308403947952,
+    "openvino_throughput_vs_python": 2.0786895334739506,
+    "openvino_throughput_vs_cpp": 2.3391334843610423
+  }
+}

@@ -15,6 +15,7 @@ models/
 
 # CMake build artifacts
 cpp/build/
+cpp/build-openvino/
 
 # Downloaded C++ SDKs
 cpp/third_party/

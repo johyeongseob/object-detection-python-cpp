@@ -1,0 +1,49 @@
+{
+  "created_at_utc": "2026-08-01T14:51:13.895071+00:00",
+  "model": {
+    "name": "yolo11n",
+    "path": "models/yolo11n/openvino/yolo11n.xml",
+    "input_size": 640,
+    "runtime": "OpenVINO C++"
+  },
+  "dataset": {
+    "name": "COCO val2017",
+    "images": 5000,
+    "category": "person",
+    "category_id": 1
+  },
+  "evaluation": {
+    "confidence_threshold": 0.001,
+    "nms_iou_threshold": 0.7,
+    "max_detections": 100,
+    "predictions": 128052,
+    "ap_50_95": 0.5338314798575072,
+    "ap_50": 0.7728380618304307,
+    "ap_75": 0.569490318184767,
+    "ap_small": 0.2916921974622322,
+    "ap_medium": 0.6218272283845444,
+    "ap_large": 0.7810342051647389,
+    "ar_1": 0.19534193189199217,
+    "ar_10": 0.5438433701401132,
+    "ar_100": 0.6487705298320496,
+    "ar_small": 0.44001857010213563,
+    "ar_medium": 0.7377115229653505,
+    "ar_large": 0.8561544064093226
+  },
+  "performance": {
+    "device": "gpu",
+    "warmup_iterations": 10,
+    "wall_time_seconds": 104.8406241,
+    "throughput_images_per_second": 47.6914368,
+    "mean_inference_ms": 5.789526768,
+    "p50_inference_ms": 5.7474565,
+    "p95_inference_ms": 6.0845004
+  },
+  "environment": {
+    "openvino": "2026.2.1-21919-ede283a88e3-releases/2026/2",
+    "openvino_device": "GPU",
+    "opencv_cpp": "4.6.0",
+    "cocoeval_platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+    "pycocotools": "unknown"
+  }
+}
