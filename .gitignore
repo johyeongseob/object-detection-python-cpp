@@ -9,3 +9,6 @@ datasets/coco/*.zip
 
 # Generated inference outputs
 outputs/
+
+# Downloaded model weights
+models/

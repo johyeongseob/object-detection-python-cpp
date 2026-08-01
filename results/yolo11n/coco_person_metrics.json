@@ -1,0 +1,47 @@
+{
+  "created_at_utc": "2026-08-01T10:23:48.194137+00:00",
+  "model": {
+    "name": "yolo11n",
+    "path": "models/yolo11n/yolo11n.pt",
+    "input_size": 640
+  },
+  "dataset": {
+    "name": "COCO val2017",
+    "images": 5000,
+    "category": "person",
+    "category_id": 1
+  },
+  "evaluation": {
+    "confidence_threshold": 0.001,
+    "nms_iou_threshold": 0.7,
+    "max_detections": 100,
+    "predictions": 129074,
+    "ap_50_95": 0.5291898508427844,
+    "ap_50": 0.7679461961343294,
+    "ap_75": 0.5658624391418555,
+    "ap_small": 0.28577133701339447,
+    "ap_medium": 0.6171583871194202,
+    "ap_large": 0.7778989622003621,
+    "ar_1": 0.1935881970863877,
+    "ar_10": 0.5422380996566762,
+    "ar_100": 0.647619931335251,
+    "ar_small": 0.43960074280408545,
+    "ar_medium": 0.7362342197152834,
+    "ar_large": 0.8542243262927893
+  },
+  "performance": {
+    "device": "cpu",
+    "wall_time_seconds": 217.93110807199992,
+    "throughput_images_per_second": 22.943030227461165,
+    "mean_inference_ms": 29.50131120559636,
+    "p50_inference_ms": 28.251559500404255,
+    "p95_inference_ms": 40.88574310003424
+  },
+  "environment": {
+    "cpu": "Intel(R) Core(TM) Ultra X7 358H",
+    "python": "3.10.12",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+    "torch": "2.13.0+cpu",
+    "ultralytics": "8.4.114"
+  }
+}

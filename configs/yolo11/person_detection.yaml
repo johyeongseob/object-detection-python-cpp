@@ -1,0 +1,30 @@
+model:
+  path: models/yolo11n/yolo11n.pt
+  device: cpu
+  image_size: 640
+
+detection:
+  class_id: 0
+  class_name: person
+  confidence_threshold: 0.25
+  nms_iou_threshold: 0.70
+
+data:
+  image_id: 139
+  image_dir: datasets/coco/val2017
+  annotation_file: datasets/coco/annotations/instances_val2017.json
+
+output:
+  prediction_directory: outputs/yolo11n
+  image_directory: outputs/yolo11n/images
+  results_directory: results/yolo11n
+  save_image: true
+  show_labels: true
+  show_confidence: true
+
+evaluation:
+  confidence_threshold: 0.001
+  match_iou_threshold: 0.50
+  ignore_crowd: true
+  max_detections: 100
+  progress_interval: 100
