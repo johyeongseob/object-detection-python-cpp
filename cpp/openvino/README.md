@@ -11,10 +11,17 @@ Arc B390 integrated GPU on Ubuntu 24.04 under WSL 2.
 - OpenVINO C++ Runtime
 - Intel OpenCL/Level Zero compute runtime
 
-Initialize the OpenVINO environment in every new Ubuntu 24.04 terminal before
-configuring, building, or running the C++ programs:
+Start Ubuntu 24.04 from PowerShell:
+
+```powershell
+wsl.exe -d Ubuntu-24.04
+```
+
+Enter the project and initialize the OpenVINO environment before configuring,
+building, or running the C++ programs:
 
 ```bash
+cd /mnt/c/Users/silve/Desktop/detection
 source /opt/intel/openvino_2026/setupvars.sh
 ```
 
@@ -30,7 +37,6 @@ clinfo -l
 Then configure, build, and run the OpenVINO device query:
 
 ```bash
-source /opt/intel/openvino_2026/setupvars.sh
 cmake -S cpp/openvino -B cpp/build-openvino -DCMAKE_BUILD_TYPE=Release
 cmake --build cpp/build-openvino -j
 ./cpp/build-openvino/list_openvino_devices

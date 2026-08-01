@@ -4,6 +4,13 @@ An end-to-end person-detection project using YOLO11n and COCO val2017. The
 same person-detection task is evaluated with Python/PyTorch on CPU, C++/ONNX
 Runtime on CPU, and C++/OpenVINO on an Intel integrated GPU.
 
+## Qualitative Comparison
+
+![YOLO11n person detection comparison](images/comparison.gif)
+
+Ground truth is shown in green. Python, C++, and OpenVINO predictions are
+shown in blue at a confidence threshold of 0.25.
+
 Language-specific instructions:
 
 - [Python setup and usage](python/README.md)
