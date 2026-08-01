@@ -10,7 +10,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_INPUT_DIRECTORY = PROJECT_ROOT / "images/comparison"
 DEFAULT_OUTPUT_FILE = PROJECT_ROOT / "images/comparison.gif"
 DEFAULT_WIDTH = 1280
-DEFAULT_DURATION_MS = 1000
+DEFAULT_DURATION_MS = 1500
 
 
 def parse_args() -> argparse.Namespace:
