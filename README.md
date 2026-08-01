@@ -25,6 +25,7 @@ COCO metric averaged over IoU thresholds from 0.50 to 0.95.
   <thead>
     <tr>
       <th>Metric</th>
+      <th>GT</th>
       <th>Python CPU</th>
       <th>C++ CPU</th>
       <th>OpenVINO iGPU</th>
@@ -34,20 +35,41 @@ COCO metric averaged over IoU thresholds from 0.50 to 0.95.
   <tbody>
     <tr>
       <td>Person mAP</td>
+      <td align="right">-</td>
       <td align="right">0.5292</td>
       <td align="right">0.5338</td>
       <td align="right">0.5338</td>
       <td align="right">+0.0046</td>
     </tr>
     <tr>
+      <td>BBoxes</td>
+      <td align="right">11,004</td>
+      <td align="right">129,074</td>
+      <td align="right">128,230</td>
+      <td align="right">128,052</td>
+      <td align="right">-1,022</td>
+    </tr>
+    <tr>
       <td>Avg. latency</td>
+      <td align="right">-</td>
       <td align="right">29.50 ms</td>
       <td align="right">23.01 ms</td>
       <td align="right">5.79 ms</td>
       <td align="right">5.10x</td>
     </tr>
+    <tr>
+      <td>Throughput</td>
+      <td align="right">-</td>
+      <td align="right">22.94 img/s</td>
+      <td align="right">20.39 img/s</td>
+      <td align="right">47.69 img/s</td>
+      <td align="right">2.08x</td>
+    </tr>
   </tbody>
 </table>
+
+GT BBoxes is the number of all COCO `person` annotations, including 227 crowd
+annotations.
 
 
 ## Repository Layout
