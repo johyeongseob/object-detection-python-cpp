@@ -4,37 +4,51 @@ An end-to-end person-detection project using YOLO11n and COCO val2017. The
 same person-detection task is evaluated with Python/PyTorch on CPU, C++/ONNX
 Runtime on CPU, and C++/OpenVINO on an Intel integrated GPU.
 
-## Qualitative Comparison
+## YOLO11n Runtime Comparison
+
+### Qualitative
 
 ![YOLO11n person detection comparison](images/comparison.gif)
 
 Ground truth is shown in green. Python, C++, and OpenVINO predictions are
 shown in blue at a confidence threshold of 0.25.
 
-Language-specific instructions:
-
-- [Python setup and usage](python/README.md)
-- [C++ dependencies and ONNX Runtime usage](cpp/README.md)
-- [OpenVINO C++ and Intel iGPU usage](cpp/openvino/README.md)
-
-## YOLO11n Runtime Comparison
+### Quantitative
 
 All implementations evaluated the COCO val2017 `person` category over 5,000
 images with an input size of 640, batch size 1, confidence threshold 0.001,
-NMS IoU threshold 0.70, and at most 100 detections per image.
+NMS IoU threshold 0.70, and at most 100 detections per image; mAP follows the
+COCO metric averaged over IoU thresholds from 0.50 to 0.95.
 
-The `Δ` column shows the absolute accuracy difference and the latency ratio of
-OpenVINO iGPU relative to Python CPU.
 
-| Metric | Python CPU | C++ CPU | OpenVINO iGPU | Δ (OpenVINO/Python) |
-| --- | ---: | ---: | ---: | ---: |
-| Person mAP@0.50:0.95 | 0.5292 | 0.5338 | 0.5338 | +0.0046 |
-| Avg. latency | 29.50 ms | 23.01 ms | 5.79 ms | 5.10x |
+<table width="100%">
+  <thead>
+    <tr>
+      <th>Metric</th>
+      <th>Python CPU</th>
+      <th>C++ CPU</th>
+      <th>OpenVINO iGPU</th>
+      <th>&Delta; (OpenVINO/Python)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Person mAP</td>
+      <td align="right">0.5292</td>
+      <td align="right">0.5338</td>
+      <td align="right">0.5338</td>
+      <td align="right">+0.0046</td>
+    </tr>
+    <tr>
+      <td>Avg. latency</td>
+      <td align="right">29.50 ms</td>
+      <td align="right">23.01 ms</td>
+      <td align="right">5.79 ms</td>
+      <td align="right">5.10x</td>
+    </tr>
+  </tbody>
+</table>
 
-OpenVINO retained accuracy parity with ONNX Runtime while reducing mean model
-inference latency by approximately 74.8% relative to C++ CPU inference. The
-complete machine-readable comparison is available in
-[`results/yolo11n/python_cpp_openvino_comparison.json`](results/yolo11n/python_cpp_openvino_comparison.json).
 
 ## Repository Layout
 
