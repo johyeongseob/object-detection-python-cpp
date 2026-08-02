@@ -17,14 +17,14 @@ shown in blue at a confidence threshold of 0.25.
 
 All implementations evaluated the COCO val2017 `person` category over 5,000
 images with an input size of 640, batch size 1, confidence threshold 0.001,
-NMS IoU threshold 0.70, and at most 100 detections per image; mAP follows the
-COCO metric averaged over IoU thresholds from 0.50 to 0.95.
+NMS IoU threshold 0.70, and at most 100 detections per image.
 
 
 <table width="100%">
   <thead>
     <tr>
       <th>Metric</th>
+      <th>GT</th>
       <th>Python CPU</th>
       <th>C++ CPU</th>
       <th>OpenVINO iGPU</th>
@@ -33,21 +33,24 @@ COCO metric averaged over IoU thresholds from 0.50 to 0.95.
   </thead>
   <tbody>
     <tr>
-      <td>Person mAP</td>
+      <td>Person AP@[0.50:0.95]</td>
+      <td align="right">-</td>
       <td align="right">0.5292</td>
       <td align="right">0.5338</td>
       <td align="right">0.5338</td>
       <td align="right">+0.0046</td>
     </tr>
     <tr>
-      <td>Predictions</td>
-      <td align="right">129,074</td>
-      <td align="right">128,230</td>
-      <td align="right">128,052</td>
-      <td align="right">-1,022</td>
+      <td>Person BBoxes</td>
+      <td align="right">11,004</td>
+      <td align="right">9,019</td>
+      <td align="right">9,384</td>
+      <td align="right">9,383</td>
+      <td align="right">+364</td>
     </tr>
     <tr>
       <td>Avg. latency</td>
+      <td align="right">-</td>
       <td align="right">29.50 ms</td>
       <td align="right">23.01 ms</td>
       <td align="right">5.79 ms</td>
@@ -55,6 +58,7 @@ COCO metric averaged over IoU thresholds from 0.50 to 0.95.
     </tr>
     <tr>
       <td>Throughput</td>
+      <td align="right">-</td>
       <td align="right">22.94 img/s</td>
       <td align="right">20.39 img/s</td>
       <td align="right">47.69 img/s</td>
