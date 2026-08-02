@@ -21,7 +21,7 @@ Enter the project and initialize the OpenVINO environment before configuring,
 building, or running the C++ programs:
 
 ```bash
-cd /mnt/c/Users/silve/Desktop/detection
+cd /mnt/c/Users/YOUR_WINDOWS_USERNAME/Desktop/detection
 source /opt/intel/openvino_2026/setupvars.sh
 ```
 

@@ -13,7 +13,7 @@ and implementation plan are documented in
 - C++17
 - CMake
 - ONNX Runtime C++ 1.23.2
-- OpenCV C++ for image processing and visualization (next milestone)
+- OpenCV C++ for image processing and visualization
 - YOLO11n exported to ONNX
 - WSL 2 with Ubuntu 22.04
 
@@ -127,51 +127,3 @@ are written under `outputs/yolo11n/`, while the compact metrics summary is
 written to `results/yolo11n/cpp_coco_person_metrics.json`. The C++ program
 writes runtime fields first, and the shared COCOeval command adds AP and AR to
 the same JSON file.
-
-Evaluate the C++ predictions with the same Python COCOeval implementation used
-by the Python baseline:
-
-```bash
-python evaluation/evaluate_cpp_coco_person.py
-```
-
-For a smoke test, use the same limit for inference and evaluation:
-
-```bash
-./cpp/build/evaluate_coco_person --limit 10
-python evaluation/evaluate_cpp_coco_person.py --limit 10
-```
-
-## Shared Assets
-
-Models and datasets remain at the repository root so both languages consume
-the same inputs. Their preparation is documented in the root
-[README](../README.md#common-data-and-model-setup).
-
-```text
-models/yolo11n/yolo11n.pt
-models/yolo11n/yolo11n.onnx
-datasets/coco/val2017/
-datasets/coco/annotations/instances_val2017.json
-configs/yolo11n/person_detection.yaml
-```
-
-The initial C++ milestone will load one image, run person-only inference, and
-save `outputs/yolo11n/images/cpp_139_person.jpg`.
-
-## Evaluation Plan
-
-After single-image parity is confirmed, C++ will process all 5,000 COCO
-validation images with batch size 1. Predictions will be evaluated by the
-same Python `pycocotools.COCOeval` path used for the baseline, keeping the
-evaluator constant.
-
-The final comparison will include:
-
-- COCO AP and AR accuracy
-- Bounding-box and confidence parity
-- Mean, P50, and P95 inference latency
-- End-to-end throughput
-- Runtime environment and configuration
-
-See the root [README](../README.md) for the completed Python baseline.
