@@ -68,6 +68,17 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_IMAGE_DIRECTORY,
         help="Directory containing the person-positive COCO images.",
     )
+    parser.add_argument(
+        "--portrait-same-size",
+        action="store_true",
+        help="Select portrait images with one shared native resolution and avoid letterboxing.",
+    )
+    parser.add_argument(
+        "--output-root",
+        type=Path,
+        default=GALLERY_DIRECTORY,
+        help="Root directory for generated target galleries.",
+    )
     return parser.parse_args()
 
 
@@ -97,7 +108,12 @@ def load_predictions(path: Path) -> dict[int, list[dict[str, Any]]]:
     return grouped
 
 
-def select_image_ids(coco: COCO, image_directory: Path, count: int) -> list[int]:
+def select_image_ids(
+    coco: COCO,
+    image_directory: Path,
+    count: int,
+    portrait_same_size: bool,
+) -> list[int]:
     """Select deterministic person-positive images available in the source."""
     if count <= 0:
         raise ValueError("--count must be positive")
@@ -105,6 +121,7 @@ def select_image_ids(coco: COCO, image_directory: Path, count: int) -> list[int]
         raise FileNotFoundError(f"Image directory not found: {image_directory}")
 
     candidates: list[int] = []
+    candidates_by_size: dict[tuple[int, int], list[int]] = defaultdict(list)
     for image_id in sorted(coco.getImgIds(catIds=[PERSON_CATEGORY_ID])):
         if not (image_directory / f"{image_id:012d}.jpg").is_file():
             continue
@@ -115,6 +132,30 @@ def select_image_ids(coco: COCO, image_directory: Path, count: int) -> list[int]
         visible_people = [item for item in annotations if not item["iscrowd"]]
         if 1 <= len(visible_people) <= 8:
             candidates.append(image_id)
+            image_info = coco.loadImgs([image_id])[0]
+            width = int(image_info["width"])
+            height = int(image_info["height"])
+            if width < height:
+                candidates_by_size[(width, height)].append(image_id)
+
+    if portrait_same_size:
+        eligible_groups = [
+            (size, image_ids)
+            for size, image_ids in candidates_by_size.items()
+            if len(image_ids) >= count
+        ]
+        if not eligible_groups:
+            raise RuntimeError(
+                "No portrait resolution contains enough person-positive images"
+            )
+        selected_size, candidates = max(
+            eligible_groups,
+            key=lambda item: (len(item[1]), item[0][0] * item[0][1]),
+        )
+        print(
+            f"Selected native resolution: {selected_size[0]} x {selected_size[1]} "
+            f"({len(candidates)} candidates)"
+        )
 
     if len(candidates) < count:
         raise RuntimeError("Not enough person-positive images for the gallery")
@@ -185,7 +226,17 @@ def create_gallery(args: argparse.Namespace) -> None:
     )
     targets = tuple(dict.fromkeys(args.targets))
     coco = COCO(str(ANNOTATION_FILE))
-    image_ids = select_image_ids(coco, image_directory, args.count)
+    output_root = (
+        args.output_root
+        if args.output_root.is_absolute()
+        else PROJECT_ROOT / args.output_root
+    )
+    image_ids = select_image_ids(
+        coco,
+        image_directory,
+        args.count,
+        args.portrait_same_size,
+    )
     runtime_predictions = {
         runtime: load_predictions(existing_file(candidates))
         for runtime, candidates in PREDICTION_FILES.items()
@@ -193,16 +244,18 @@ def create_gallery(args: argparse.Namespace) -> None:
     }
 
     for directory_name in targets:
-        (GALLERY_DIRECTORY / directory_name).mkdir(parents=True, exist_ok=True)
+        (output_root / directory_name).mkdir(parents=True, exist_ok=True)
 
-    manifest_images: list[dict[str, Any]] = []
     for image_id in image_ids:
         source_path = image_directory / f"{image_id:012d}.jpg"
         source = cv2.imread(str(source_path))
         if source is None:
             raise FileNotFoundError(f"COCO image not found: {source_path}")
 
-        canvas, scale, left, top = letterbox(source)
+        if args.portrait_same_size:
+            canvas, scale, left, top = source.copy(), 1.0, 0, 0
+        else:
+            canvas, scale, left, top = letterbox(source)
         annotation_ids = coco.getAnnIds(
             imgIds=[image_id], catIds=[PERSON_CATEGORY_ID]
         )
@@ -221,9 +274,8 @@ def create_gallery(args: argparse.Namespace) -> None:
                     None,
                     GROUND_TRUTH_COLOR,
                 )
-            save_image(GALLERY_DIRECTORY / "gt" / filename, ground_truth_image)
+            save_image(output_root / "gt" / filename, ground_truth_image)
 
-        prediction_counts: dict[str, int] = {}
         for runtime, grouped_predictions in runtime_predictions.items():
             runtime_image = canvas.copy()
             predictions = grouped_predictions.get(image_id, [])
@@ -234,36 +286,10 @@ def create_gallery(args: argparse.Namespace) -> None:
                     box,
                     float(prediction["score"]),
                 )
-            save_image(GALLERY_DIRECTORY / runtime / filename, runtime_image)
-            prediction_counts[runtime] = len(predictions)
-
-        manifest_images.append(
-            {
-                "image_id": image_id,
-                "file": filename,
-                "ground_truth_people": len(annotations),
-                "predictions_at_0.25": prediction_counts,
-            }
-        )
-
-    manifest = {
-        "dataset": "COCO val2017",
-        "category": "person",
-        "image_count": len(image_ids),
-        "targets": list(targets),
-        "image_directory": str(image_directory.relative_to(PROJECT_ROOT)),
-        "canvas_size": [CANVAS_SIZE, CANVAS_SIZE],
-        "visualization_confidence": VISUALIZATION_CONFIDENCE,
-        "images": manifest_images,
-    }
-    manifest_path = GALLERY_DIRECTORY / "manifest.json"
-    with manifest_path.open("w", encoding="utf-8") as file:
-        json.dump(manifest, file, indent=2)
-        file.write("\n")
+            save_image(output_root / runtime / filename, runtime_image)
 
     print(f"Created {len(image_ids)} images for: {', '.join(targets)}")
-    print(f"Gallery:  {GALLERY_DIRECTORY}")
-    print(f"Manifest: {manifest_path}")
+    print(f"Gallery:  {output_root}")
 
 
 if __name__ == "__main__":
