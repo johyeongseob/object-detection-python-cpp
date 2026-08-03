@@ -49,7 +49,7 @@ NMS IoU threshold 0.70, and at most 100 detections per image.
       <td align="right">+364</td>
     </tr>
     <tr>
-      <td>Avg. latency</td>
+      <td>Model latency</td>
       <td align="right">-</td>
       <td align="right">29.50 ms</td>
       <td align="right">23.01 ms</td>
@@ -57,7 +57,7 @@ NMS IoU threshold 0.70, and at most 100 detections per image.
       <td align="right">5.10x</td>
     </tr>
     <tr>
-      <td>Throughput</td>
+      <td>End-to-end throughput</td>
       <td align="right">-</td>
       <td align="right">22.94 img/s</td>
       <td align="right">20.39 img/s</td>
