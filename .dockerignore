@@ -1,0 +1,27 @@
+# Version-control and editor metadata
+.git/
+.github/
+.vscode/
+
+# Python environment and caches
+.venv/
+**/__pycache__/
+**/*.pyc
+
+# Large or generated project assets
+datasets/
+models/
+outputs/
+results/
+images/
+
+# Components not required by the C++ CPU image
+python/
+evaluation/
+configs/
+
+# Local C++ build products and downloaded SDKs
+cpp/build/
+cpp/build-openvino/
+cpp/third_party/
+

@@ -74,6 +74,7 @@ NMS IoU threshold 0.70, and at most 100 detections per image.
 |-- configs/                 Shared experiment settings
 |-- python/                  Python programs, dependencies, and documentation
 |-- cpp/                     C++17, CMake, and C++ documentation
+|-- docker/                  Reproducible container definitions
 |-- evaluation/              Shared COCO evaluation and comparison tools
 |-- datasets/                Downloaded data and dataset utilities
 |-- models/                  Models shared by Python and C++
@@ -160,6 +161,54 @@ evaluation thresholds, maximum detections, and output directories.
 | Evaluation confidence | 0.001 | COCO precision-recall evaluation |
 | NMS IoU | 0.70 | Suppression among model predictions |
 | Match IoU | 0.50 | Single-image prediction-to-ground-truth matching |
+
+## Docker
+
+The public Docker image packages the C++ CPU application, OpenCV runtime, and
+ONNX Runtime in an Ubuntu 22.04 environment. Model files, datasets, and
+generated outputs remain outside the image and are mounted at runtime.
+
+Pull the prebuilt image from Docker Hub:
+
+```bash
+docker pull johyeongseob/person-detection-cpp:dev
+```
+
+Before running it, ensure the following files exist in the project directory:
+
+```text
+models/yolo11n/yolo11n.onnx
+datasets/coco/val2017/000000000139.jpg
+```
+
+Run single-image person detection from Linux or WSL:
+
+```bash
+docker run --rm \
+  --volume "$(pwd)/models:/workspace/models:ro" \
+  --volume "$(pwd)/datasets:/workspace/datasets:ro" \
+  --volume "$(pwd)/outputs:/workspace/outputs" \
+  johyeongseob/person-detection-cpp:dev
+```
+
+The result is written to:
+
+```text
+outputs/yolo11n/images/cpp_139_person.jpg
+```
+
+To build the image locally from this repository instead of pulling it:
+
+```bash
+docker build \
+  --file docker/cpp-cpu/Dockerfile \
+  --tag person-detection-cpp:dev \
+  .
+```
+
+The container isolates the application dependencies, so users do not need to
+install OpenCV, ONNX Runtime, or CMake on the host. Docker itself and the
+external model and input files are still required.
 
 ## Citation
 
