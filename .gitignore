@@ -13,6 +13,7 @@ outputs/
 # Generated visualization images except the README comparison GIF
 images/*
 !images/comparison.gif
+!images/detection_http.png
 
 # Downloaded model weights
 models/
