@@ -56,6 +56,7 @@ COPY --from=builder /app/cpp/build/detect_person_image /usr/local/bin/
 COPY --from=builder /app/cpp/build/evaluate_coco_person /usr/local/bin/
 COPY --from=builder /app/cpp/build/person_detection_server /usr/local/bin/
 COPY --from=builder /app/cpp/build/verify_yolo11n_onnx /usr/local/bin/
+COPY web/ /workspace/web/
 
 ENV LD_LIBRARY_PATH=/opt/onnxruntime/lib
 WORKDIR /workspace

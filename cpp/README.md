@@ -130,8 +130,9 @@ Start the C++ HTTP server:
 ./cpp/build/person_detection_server
 ```
 
-The server loads `models/yolo11n/yolo11n.onnx` once and listens on all network
-interfaces at port 8080. Open the upload interface at:
+The server loads `models/yolo11n/yolo11n.onnx` once, serves the static files
+from `web/`, and listens on all network interfaces at port 8080. Open the
+upload interface at:
 
 ```text
 http://localhost:8080
@@ -145,10 +146,11 @@ Available routes:
 | `POST` | `/detect` | Run person detection and return an annotated JPEG |
 | `GET` | `/health` | Return server status as JSON |
 
-A custom model path and port can be passed in that order:
+A custom model path, port, and web asset directory can be passed in that
+order:
 
 ```bash
-./cpp/build/person_detection_server path/to/model.onnx 5000
+./cpp/build/person_detection_server path/to/model.onnx 5000 path/to/web
 ```
 
 Ten warm-up iterations run before measurement by default. Raw COCO predictions

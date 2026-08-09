@@ -6,6 +6,7 @@
 
 #include <cstddef>
 #include <exception>
+#include <filesystem>
 #include <iomanip>
 #include <iostream>
 #include <mutex>
@@ -23,91 +24,23 @@ constexpr int kMaxDetections = 100;
 constexpr int kDefaultPort = 8080;
 constexpr std::size_t kMaximumUploadBytes = 20U * 1024U * 1024U;
 
-const char* kIndexHtml = R"HTML(<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>YOLO11n Person Detection</title>
-  <style>
-    :root { color-scheme: dark; font-family: system-ui, sans-serif; }
-    body { margin: 0; background: #111827; color: #f9fafb; }
-    main { width: min(900px, calc(100% - 32px)); margin: 48px auto; }
-    .card { background: #1f2937; border: 1px solid #374151; border-radius: 16px; padding: 24px; }
-    h1 { margin-top: 0; }
-    p { color: #d1d5db; }
-    .controls { display: flex; gap: 12px; flex-wrap: wrap; margin: 20px 0; }
-    input { flex: 1; min-width: 240px; padding: 10px; background: #111827; border: 1px solid #4b5563; border-radius: 8px; }
-    button { padding: 10px 18px; border: 0; border-radius: 8px; background: #2563eb; color: white; font-weight: 700; cursor: pointer; }
-    button:disabled { opacity: 0.55; cursor: wait; }
-    #status { min-height: 24px; }
-    #result { display: none; max-width: 100%; margin-top: 16px; border-radius: 10px; }
-  </style>
-</head>
-<body>
-  <main>
-    <div class="card">
-      <h1>YOLO11n Person Detection</h1>
-      <p>Select an image to run the C++ ONNX Runtime detector.</p>
-      <div class="controls">
-        <input id="file" type="file" accept="image/*">
-        <button id="detect">Detect people</button>
-      </div>
-      <div id="status">Ready</div>
-      <img id="result" alt="Person detection result">
-    </div>
-  </main>
-  <script>
-    const fileInput = document.getElementById('file');
-    const button = document.getElementById('detect');
-    const status = document.getElementById('status');
-    const result = document.getElementById('result');
-    let resultUrl = null;
-
-    button.addEventListener('click', async () => {
-      const file = fileInput.files[0];
-      if (!file) {
-        status.textContent = 'Choose an image first.';
-        return;
-      }
-
-      button.disabled = true;
-      result.style.display = 'none';
-      status.textContent = 'Running detection...';
-      try {
-        const response = await fetch('/detect', {
-          method: 'POST',
-          headers: { 'Content-Type': file.type || 'application/octet-stream' },
-          body: file
-        });
-        if (!response.ok) {
-          throw new Error(await response.text());
-        }
-
-        const blob = await response.blob();
-        if (resultUrl) URL.revokeObjectURL(resultUrl);
-        resultUrl = URL.createObjectURL(blob);
-        result.src = resultUrl;
-        result.style.display = 'block';
-        const count = response.headers.get('X-Detection-Count');
-        const latency = response.headers.get('X-Inference-Ms');
-        status.textContent = `${count} person(s) detected | ${latency} ms model inference`;
-      } catch (error) {
-        status.textContent = `Error: ${error.message}`;
-      } finally {
-        button.disabled = false;
-      }
-    });
-  </script>
-</body>
-</html>)HTML";
-
 void set_error(
     httplib::Response& response,
     int status,
     const std::string& message) {
     response.status = status;
     response.set_content(message, "text/plain; charset=utf-8");
+}
+
+void serve_file(
+    httplib::Response& response,
+    const std::filesystem::path& path,
+    const std::string& content_type) {
+    if (!std::filesystem::is_regular_file(path)) {
+        set_error(response, 500, "Web asset not found: " + path.string());
+        return;
+    }
+    response.set_file_content(path.string(), content_type);
 }
 
 int parse_port(const char* value) {
@@ -126,6 +59,11 @@ int main(int argc, char* argv[]) {
 
     try {
         const int port = argc > 2 ? parse_port(argv[2]) : kDefaultPort;
+        const std::filesystem::path web_root = argc > 3 ? argv[3] : "web";
+        const std::filesystem::path index_path = web_root / "index.html";
+        const std::filesystem::path style_path = web_root / "style.css";
+        const std::filesystem::path app_path = web_root / "app.js";
+
         PersonDetector detector{
             model_path,
             kInputSize,
@@ -136,9 +74,24 @@ int main(int argc, char* argv[]) {
 
         httplib::Server server;
         server.set_payload_max_length(kMaximumUploadBytes);
-        server.Get("/", [](const httplib::Request&, httplib::Response& response) {
-            response.set_content(kIndexHtml, "text/html; charset=utf-8");
-        });
+        server.Get(
+            "/",
+            [&](const httplib::Request&, httplib::Response& response) {
+                serve_file(response, index_path, "text/html; charset=utf-8");
+            });
+        server.Get(
+            "/style.css",
+            [&](const httplib::Request&, httplib::Response& response) {
+                serve_file(response, style_path, "text/css; charset=utf-8");
+            });
+        server.Get(
+            "/app.js",
+            [&](const httplib::Request&, httplib::Response& response) {
+                serve_file(
+                    response,
+                    app_path,
+                    "application/javascript; charset=utf-8");
+            });
         server.Get(
             "/health",
             [](const httplib::Request&, httplib::Response& response) {
@@ -196,6 +149,7 @@ int main(int argc, char* argv[]) {
             });
 
         std::cout << "Model: " << model_path << '\n';
+        std::cout << "Web assets: " << web_root.string() << '\n';
         std::cout << "Server: http://localhost:" << port << '\n';
         std::cout << "Health: http://localhost:" << port << "/health\n";
         if (!server.listen("0.0.0.0", port)) {

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>YOLO11n Person Detection</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main>
+    <div class="card">
+      <h1>YOLO11n Person Detection</h1>
+      <p>Select an image to run the C++ ONNX Runtime detector.</p>
+      <div class="controls">
+        <input id="file" type="file" accept="image/*">
+        <button id="detect">Detect people</button>
+      </div>
+      <div id="status">Ready</div>
+      <img id="result" alt="Person detection result">
+    </div>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>

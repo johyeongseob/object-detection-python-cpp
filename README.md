@@ -75,6 +75,7 @@ NMS IoU threshold 0.70, and at most 100 detections per image.
 |-- python/                  Python programs, dependencies, and documentation
 |-- cpp/                     C++17, CMake, and C++ documentation
 |-- docker/                  Reproducible container definitions
+|-- web/                     Browser interface for the C++ HTTP server
 |-- evaluation/              Shared COCO evaluation and comparison tools
 |-- datasets/                Downloaded data and dataset utilities
 |-- models/                  Models shared by Python and C++
