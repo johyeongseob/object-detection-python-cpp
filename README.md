@@ -2,22 +2,19 @@
 
 An end-to-end person-detection project using YOLO11n and COCO val2017. The
 same person-detection task is evaluated with Python/PyTorch on CPU, C++/ONNX
-Runtime on CPU, and C++/OpenVINO on an Intel integrated GPU.
+Runtime on CPU, and C++/OpenVINO on an Intel integrated GPU (iGPU).
 
 ## YOLO11n Runtime Comparison
 
-### Qualitative
-
 ![YOLO11n person detection comparison](images/comparison.gif)
 
-Ground truth is shown in green. Python, C++, and OpenVINO predictions are
-shown in blue at a confidence threshold of 0.25.
+🟩 Ground truth is shown in green. 🟦 Python, C++, and OpenVINO predictions
+are shown in blue at a confidence threshold of **0.25**.
 
-### Quantitative
+### Benchmark Results
 
-All implementations evaluated the COCO val2017 `person` category over 5,000
-images with an input size of 640, batch size 1, confidence threshold 0.001,
-NMS IoU threshold 0.70, and at most 100 detections per image.
+All implementations evaluated the COCO val2017 `person` category over **5,000**
+images with an input size of **640**, batch size **1**, confidence threshold **0.001**, NMS IoU threshold **0.70**, and at most **100** detections per image.
 
 
 <table width="100%">
@@ -96,8 +93,8 @@ OpenVINO iGPU pipeline uses Ubuntu 24.04 for Intel Arc B390 compute-runtime
 support. Clone the repository and enter it from WSL:
 
 ```bash
-git clone https://github.com/johyeongseob/object-detection-python-cpp.git
-cd object-detection-python-cpp
+git clone https://github.com/johyeongseob/person-detection-python-cpp.git
+cd person-detection-python-cpp
 ```
 
 For a repository stored on the Windows filesystem:
@@ -156,12 +153,6 @@ configs/yolo11n/person_detection.yaml
 The shared keys define the model and dataset paths, input size, detection and
 evaluation thresholds, maximum detections, and output directories.
 
-| Setting | Value | Purpose |
-| --- | ---: | --- |
-| Detection confidence | 0.25 | Single-image visualization |
-| Evaluation confidence | 0.001 | COCO precision-recall evaluation |
-| NMS IoU | 0.70 | Suppression among model predictions |
-| Match IoU | 0.50 | Single-image prediction-to-ground-truth matching |
 
 ## Docker
 
@@ -184,11 +175,6 @@ downloads the official PyTorch weights, and exports them to ONNX:
 bash scripts/prepare_yolo11n.sh
 ```
 
-The generated model is stored at:
-
-```text
-models/yolo11n/yolo11n.onnx
-```
 
 Start the C++ person-detection web server from Linux or WSL:
 
@@ -221,14 +207,6 @@ docker run --rm \
   detect_person_image
 ```
 
-To build the image locally from this repository instead of pulling it:
-
-```bash
-docker build \
-  --file docker/cpp-cpu/Dockerfile \
-  --tag person-detection-cpp:dev \
-  .
-```
 
 The container isolates the application dependencies, so users do not need to
 install OpenCV, ONNX Runtime, or CMake on the host. Docker itself and the
@@ -236,7 +214,7 @@ external model file are still required.
 
 ## Citation
 
-This project uses Ultralytics YOLO11:
+This project uses Ultralytics YOLO11 and the Microsoft COCO dataset:
 
 ```bibtex
 @software{yolo11_ultralytics,
@@ -247,5 +225,16 @@ This project uses Ultralytics YOLO11:
   url = {https://github.com/ultralytics/ultralytics},
   orcid = {0000-0001-5950-6979, 0000-0003-3783-7069},
   license = {AGPL-3.0}
+}
+
+@inproceedings{lin2014microsoft,
+  title = {Microsoft COCO: Common Objects in Context},
+  author = {Lin, Tsung-Yi and Maire, Michael and Belongie, Serge and
+            Hays, James and Perona, Pietro and Ramanan, Deva and
+            Doll{\'a}r, Piotr and Zitnick, C. Lawrence},
+  booktitle = {European Conference on Computer Vision},
+  pages = {740--755},
+  year = {2014},
+  organization = {Springer}
 }
 ```
