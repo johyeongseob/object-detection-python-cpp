@@ -6,7 +6,7 @@ Arc B390 integrated GPU on Ubuntu 24.04 under WSL 2.
 ## Environment
 
 - WSL 2
-- Ubuntu 24.04
+- **Ubuntu 24.04**
 - Intel Arc B390 integrated GPU
 - OpenVINO C++ Runtime
 - Intel OpenCL/Level Zero compute runtime
@@ -84,10 +84,10 @@ cpp/openvino/
 `-- README.md
 ```
 
-The device query and single-image detector are implemented. The full COCO
-evaluator is planned after the single-image output is validated.
+The device query, single-image detector, and full COCO evaluator are
+implemented.
 
-OpenVINO build artifacts will be generated separately from the ONNX Runtime
+OpenVINO build artifacts are generated separately from the ONNX Runtime
 build:
 
 ```text
@@ -95,11 +95,31 @@ cpp/build/             ONNX Runtime CPU build
 cpp/build-openvino/    OpenVINO iGPU build
 ```
 
-## Planned Artifacts
+## COCO Evaluation
+
+Run a 10-image smoke test:
+
+```bash
+./cpp/build-openvino/evaluate_coco_person_openvino --limit 10
+```
+
+Run inference on all 5,000 COCO val2017 images:
+
+```bash
+./cpp/build-openvino/evaluate_coco_person_openvino
+```
+
+Calculate COCO person-detection metrics from the saved predictions:
+
+```bash
+python evaluation/evaluate_openvino_coco_person.py
+```
+
+Generated artifacts:
 
 ```text
 outputs/yolo11n/openvino_gpu_coco_val2017_person_predictions.json
 results/yolo11n/openvino_gpu_coco_person_metrics.json
 ```
 
-Accuracy will be calculated by the shared tools under `evaluation/`.
+Accuracy is calculated by the shared tools under `evaluation/`.

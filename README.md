@@ -1,8 +1,7 @@
 # Person Detection: Python to C++
 
-An end-to-end person-detection project using YOLO11n and COCO val2017. The
-same person-detection task is evaluated with Python/PyTorch on CPU, C++/ONNX
-Runtime on CPU, and C++/OpenVINO on an Intel integrated GPU (iGPU).
+An end-to-end **person-detection** project using YOLO11n and COCO val2017. The
+same person-detection task is evaluated with **Python/PyTorch** on CPU, **C++/ONNX Runtime** on CPU, and **C++/OpenVINO** on an Intel integrated GPU (iGPU).
 
 ## YOLO11n Runtime Comparison
 
@@ -195,18 +194,13 @@ The model is loaded once when the server starts. Each `POST /detect` request
 runs the existing C++ detector and returns a JPEG with person bounding boxes.
 `GET /health` provides a lightweight status check.
 
-The original command-line detector remains available by overriding the
-container command and mounting the model, dataset, and output directories:
+Available routes:
 
-```bash
-docker run --rm \
-  --volume "$(pwd)/models:/workspace/models:ro" \
-  --volume "$(pwd)/datasets:/workspace/datasets:ro" \
-  --volume "$(pwd)/outputs:/workspace/outputs" \
-  johyeongseob/person-detection-cpp:dev \
-  detect_person_image
-```
-
+| Method | Route | Purpose |
+| --- | --- | --- |
+| `GET` | `/` | Browser image-upload interface |
+| `POST` | `/detect` | Run person detection and return an annotated JPEG |
+| `GET` | `/health` | Return server status as JSON |
 
 The container isolates the application dependencies, so users do not need to
 install OpenCV, ONNX Runtime, or CMake on the host. Docker itself and the

@@ -1,14 +1,12 @@
 # C++ Person Detection
 
-This directory contains the C++17 and CMake implementation of the Python
-person-detection baseline. The current first milestone verifies that ONNX
-Runtime C++ can load and execute the exported YOLO11n ONNX model.
+This directory contains the C++17 and CMake implementation of YOLO11n person
+detection with ONNX Runtime.
 
-The next backend is OpenVINO on the Intel Arc B390 integrated GPU. Its setup
-and implementation plan are documented in
-[`openvino/README.md`](openvino/README.md).
+See [`openvino/README.md`](openvino/README.md) for the Intel iGPU
+implementation.
 
-## Planned Stack
+## Technology Stack
 
 - C++17
 - CMake
@@ -18,29 +16,18 @@ and implementation plan are documented in
 - YOLO11n exported to ONNX
 - WSL 2 with Ubuntu 22.04
 
-ONNX is used as a deployment artifact between the trained PyTorch model and
-the C++ runtime. It is not a separate application layer.
+YOLO11n is exported from PyTorch to ONNX and executed in C++ with ONNX
+Runtime.
 
 ## System Dependencies
 
-C++ dependencies are installed through Ubuntu rather than
-`python/requirements.txt`:
+Install the C++ system dependencies in Ubuntu:
 
 ```bash
 sudo apt update
 sudo apt install -y build-essential cmake pkg-config libopencv-dev
 ```
 
-Verify the toolchain:
-
-```bash
-g++ --version
-cmake --version
-pkg-config --version
-pkg-config --modversion opencv4
-test -f /usr/include/opencv4/opencv2/dnn.hpp \
-  && echo "OpenCV DNN headers: OK"
-```
 
 `CMakeLists.txt` will describe compilation and library linking. It does not
 replace the operating-system package installation commands above.
@@ -55,7 +42,20 @@ tar -xzf cpp/third_party/onnxruntime-linux-x64-1.23.2.tgz \
   -C cpp/third_party
 ```
 
-The downloaded `cpp/third_party/` directory is excluded from Git.
+## Model Preparation
+
+The C++ programs do not download model files automatically. Prepare the
+YOLO11n ONNX model from the repository root:
+
+```bash
+bash scripts/prepare_yolo11n.sh
+```
+
+The generated model is stored at:
+
+```text
+models/yolo11n/yolo11n.onnx
+```
 
 ## Current Layout
 
@@ -75,7 +75,6 @@ cpp/
 `-- README.md
 ```
 
-Build products will be placed in `cpp/build/` and excluded from Git.
 
 ## Build and Run
 
@@ -122,35 +121,6 @@ Run inference on all 5,000 validation images:
 
 ```bash
 ./cpp/build/evaluate_coco_person
-```
-
-Start the C++ HTTP server:
-
-```bash
-./cpp/build/person_detection_server
-```
-
-The server loads `models/yolo11n/yolo11n.onnx` once, serves the static files
-from `web/`, and listens on all network interfaces at port 8080. Open the
-upload interface at:
-
-```text
-http://localhost:8080
-```
-
-Available routes:
-
-| Method | Route | Purpose |
-| --- | --- | --- |
-| `GET` | `/` | Browser image-upload interface |
-| `POST` | `/detect` | Run person detection and return an annotated JPEG |
-| `GET` | `/health` | Return server status as JSON |
-
-A custom model path, port, and web asset directory can be passed in that
-order:
-
-```bash
-./cpp/build/person_detection_server path/to/model.onnx 5000 path/to/web
 ```
 
 Ten warm-up iterations run before measurement by default. Raw COCO predictions
