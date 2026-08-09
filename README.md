@@ -156,7 +156,7 @@ evaluation thresholds, maximum detections, and output directories.
 ## Docker
 
 <p align="center">
-  <img src="images/detection_http.png" alt="C++ person-detection HTTP server running in Docker" width="800">
+  <img src="images/detection_http.png" alt="C++ person-detection HTTP server running in Docker" width="650">
 </p>
 
 The public Docker image packages the C++ CPU applications, HTTP server,
