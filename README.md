@@ -184,6 +184,16 @@ docker run --rm \
   johyeongseob/person-detection-cpp:dev
 ```
 
+To stop the server from another terminal, find the running container and stop
+it with its container ID:
+
+```bash
+docker ps
+docker stop <CONTAINER_ID>
+```
+
+The `--rm` option removes the container automatically after it stops.
+
 Open the browser interface and upload an image:
 
 ```text
