@@ -6,6 +6,15 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+include(FetchContent)
+
+FetchContent_Declare(
+    cpp_httplib
+    URL https://github.com/yhirose/cpp-httplib/archive/refs/tags/v0.38.0.tar.gz
+)
+
+FetchContent_MakeAvailable(cpp_httplib)
+
 set(
     ONNXRUNTIME_ROOT
     "${CMAKE_CURRENT_SOURCE_DIR}/third_party/onnxruntime-linux-x64-1.23.2"
@@ -101,6 +110,26 @@ target_compile_options(detect_person_image PRIVATE
 )
 
 set_target_properties(detect_person_image PROPERTIES
+    BUILD_RPATH "${ONNXRUNTIME_ROOT}/lib"
+)
+
+add_executable(person_detection_server
+    src/person_detection_server.cpp
+)
+
+target_link_libraries(person_detection_server PRIVATE
+    httplib::httplib
+    person_detector
+    person_visualization
+)
+
+target_compile_options(person_detection_server PRIVATE
+    -Wall
+    -Wextra
+    -Wpedantic
+)
+
+set_target_properties(person_detection_server PROPERTIES
     BUILD_RPATH "${ONNXRUNTIME_ROOT}/lib"
 )
 

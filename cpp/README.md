@@ -14,6 +14,7 @@ and implementation plan are documented in
 - CMake
 - ONNX Runtime C++ 1.23.2
 - OpenCV C++ for image processing and visualization
+- cpp-httplib for the HTTP server
 - YOLO11n exported to ONNX
 - WSL 2 with Ubuntu 22.04
 
@@ -69,6 +70,7 @@ cpp/
 |   |-- detect_person_image.cpp
 |   |-- evaluate_coco_person.cpp
 |   |-- person_detector.cpp
+|   |-- person_detection_server.cpp
 |   `-- verify_yolo11n_onnx.cpp
 `-- README.md
 ```
@@ -120,6 +122,33 @@ Run inference on all 5,000 validation images:
 
 ```bash
 ./cpp/build/evaluate_coco_person
+```
+
+Start the C++ HTTP server:
+
+```bash
+./cpp/build/person_detection_server
+```
+
+The server loads `models/yolo11n/yolo11n.onnx` once and listens on all network
+interfaces at port 8080. Open the upload interface at:
+
+```text
+http://localhost:8080
+```
+
+Available routes:
+
+| Method | Route | Purpose |
+| --- | --- | --- |
+| `GET` | `/` | Browser image-upload interface |
+| `POST` | `/detect` | Run person detection and return an annotated JPEG |
+| `GET` | `/health` | Return server status as JSON |
+
+A custom model path and port can be passed in that order:
+
+```bash
+./cpp/build/person_detection_server path/to/model.onnx 5000
 ```
 
 Ten warm-up iterations run before measurement by default. Raw COCO predictions

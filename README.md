@@ -164,9 +164,10 @@ evaluation thresholds, maximum detections, and output directories.
 
 ## Docker
 
-The public Docker image packages the C++ CPU application, OpenCV runtime, and
-ONNX Runtime in an Ubuntu 22.04 environment. Model files, datasets, and
-generated outputs remain outside the image and are mounted at runtime.
+The public Docker image packages the C++ CPU applications, HTTP server,
+OpenCV runtime, and ONNX Runtime in an Ubuntu 22.04 environment. Model files,
+datasets, and generated outputs remain outside the image and are mounted at
+runtime.
 
 Pull the prebuilt image from Docker Hub:
 
@@ -174,27 +175,49 @@ Pull the prebuilt image from Docker Hub:
 docker pull johyeongseob/person-detection-cpp:dev
 ```
 
-Before running it, ensure the following files exist in the project directory:
+Prepare the external YOLO11n ONNX model with the provided script. On its first
+run, the script creates `.venv`, installs the pinned Python dependencies,
+downloads the official PyTorch weights, and exports them to ONNX:
+
+```bash
+bash scripts/prepare_yolo11n.sh
+```
+
+The generated model is stored at:
 
 ```text
 models/yolo11n/yolo11n.onnx
-datasets/coco/val2017/000000000139.jpg
 ```
 
-Run single-image person detection from Linux or WSL:
+Start the C++ person-detection web server from Linux or WSL:
+
+```bash
+docker run --rm \
+  --publish 8080:8080 \
+  --volume "$(pwd)/models:/workspace/models:ro" \
+  johyeongseob/person-detection-cpp:dev
+```
+
+Open the browser interface and upload an image:
+
+```text
+http://localhost:8080
+```
+
+The model is loaded once when the server starts. Each `POST /detect` request
+runs the existing C++ detector and returns a JPEG with person bounding boxes.
+`GET /health` provides a lightweight status check.
+
+The original command-line detector remains available by overriding the
+container command and mounting the model, dataset, and output directories:
 
 ```bash
 docker run --rm \
   --volume "$(pwd)/models:/workspace/models:ro" \
   --volume "$(pwd)/datasets:/workspace/datasets:ro" \
   --volume "$(pwd)/outputs:/workspace/outputs" \
-  johyeongseob/person-detection-cpp:dev
-```
-
-The result is written to:
-
-```text
-outputs/yolo11n/images/cpp_139_person.jpg
+  johyeongseob/person-detection-cpp:dev \
+  detect_person_image
 ```
 
 To build the image locally from this repository instead of pulling it:
@@ -208,7 +231,7 @@ docker build \
 
 The container isolates the application dependencies, so users do not need to
 install OpenCV, ONNX Runtime, or CMake on the host. Docker itself and the
-external model and input files are still required.
+external model file are still required.
 
 ## Citation
 
