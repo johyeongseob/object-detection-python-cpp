@@ -155,6 +155,10 @@ evaluation thresholds, maximum detections, and output directories.
 
 ## Docker
 
+<p align="center">
+  <img src="images/detection_http.png" alt="C++ person-detection HTTP server running in Docker" width="800">
+</p>
+
 The public Docker image packages the C++ CPU applications, HTTP server,
 OpenCV runtime, and ONNX Runtime in an Ubuntu 22.04 environment. Model files,
 datasets, and generated outputs remain outside the image and are mounted at
