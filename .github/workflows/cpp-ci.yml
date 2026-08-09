@@ -1,0 +1,67 @@
+name: C++ CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "cpp/**"
+      - ".github/workflows/cpp-ci.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "cpp/**"
+      - ".github/workflows/cpp-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  ONNXRUNTIME_VERSION: "1.23.2"
+
+jobs:
+  build:
+    name: Build C++ ONNX Runtime pipeline
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends \
+            build-essential \
+            ca-certificates \
+            cmake \
+            curl \
+            libopencv-dev \
+            pkg-config
+
+      - name: Download ONNX Runtime C++ SDK
+        run: |
+          archive="onnxruntime-linux-x64-${ONNXRUNTIME_VERSION}.tgz"
+          url="https://github.com/microsoft/onnxruntime/releases/download/v${ONNXRUNTIME_VERSION}/${archive}"
+          mkdir -p cpp/third_party
+          curl --fail --location --show-error --silent \
+            "${url}" \
+            --output "/tmp/${archive}"
+          tar -xzf "/tmp/${archive}" -C cpp/third_party
+          test -f "cpp/third_party/onnxruntime-linux-x64-${ONNXRUNTIME_VERSION}/include/onnxruntime_cxx_api.h"
+          test -f "cpp/third_party/onnxruntime-linux-x64-${ONNXRUNTIME_VERSION}/lib/libonnxruntime.so"
+
+      - name: Configure CMake
+        run: cmake -S cpp -B cpp/build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build C++ targets
+        run: cmake --build cpp/build --parallel
+
+      - name: Verify build outputs
+        run: |
+          test -x cpp/build/verify_yolo11n_onnx
+          test -x cpp/build/detect_person_image
+          test -x cpp/build/evaluate_coco_person
