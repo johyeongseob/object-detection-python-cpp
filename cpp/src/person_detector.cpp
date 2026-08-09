@@ -1,4 +1,5 @@
 #include "person_detector.hpp"
+#include "person_postprocessing.hpp"
 
 #include <onnxruntime_cxx_api.h>
 #include <opencv2/dnn/dnn.hpp>
@@ -233,21 +234,12 @@ public:
             confidences.push_back(confidence);
         }
 
-        std::vector<int> retained_indices;
-        cv::dnn::NMSBoxes(
+        const std::vector<int> retained_indices = apply_nms(
             boxes,
             confidences,
             confidence_threshold_,
             nms_iou_threshold_,
-            retained_indices,
-            1.0F,
-            0);
-
-        if (retained_indices.size() >
-            static_cast<std::size_t>(max_detections_)) {
-            retained_indices.resize(
-                static_cast<std::size_t>(max_detections_));
-        }
+            max_detections_);
 
         std::vector<Detection> detections;
         detections.reserve(retained_indices.size());

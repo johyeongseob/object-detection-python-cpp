@@ -20,6 +20,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT_FILE)
     parser.add_argument("--width", type=int, default=DEFAULT_WIDTH)
     parser.add_argument("--duration-ms", type=int, default=DEFAULT_DURATION_MS)
+    parser.add_argument(
+        "--grid-2x2",
+        action="store_true",
+        help="Rearrange each four-panel row into a two-by-two grid.",
+    )
     return parser.parse_args()
 
 
@@ -47,6 +52,28 @@ def create_gif(args: argparse.Namespace) -> None:
     for image_path in image_paths:
         with Image.open(image_path) as source:
             source = source.convert("RGB")
+            if args.grid_2x2:
+                if source.width % 4 != 0:
+                    raise ValueError(
+                        f"Four-panel image width is not divisible by 4: {image_path}"
+                    )
+                panel_width = source.width // 4
+                panels = [
+                    source.crop(
+                        (index * panel_width, 0, (index + 1) * panel_width, source.height)
+                    )
+                    for index in range(4)
+                ]
+                grid = Image.new(
+                    "RGB",
+                    (panel_width * 2, source.height * 2),
+                )
+                for index, panel in enumerate(panels):
+                    grid.paste(
+                        panel,
+                        ((index % 2) * panel_width, (index // 2) * source.height),
+                    )
+                source = grid
             height = round(source.height * args.width / source.width)
             resized = source.resize(
                 (args.width, height),

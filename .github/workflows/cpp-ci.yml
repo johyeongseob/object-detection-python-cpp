@@ -65,3 +65,6 @@ jobs:
           test -x cpp/build/verify_yolo11n_onnx
           test -x cpp/build/detect_person_image
           test -x cpp/build/evaluate_coco_person
+
+      - name: Run C++ tests
+        run: ctest --test-dir cpp/build --output-on-failure

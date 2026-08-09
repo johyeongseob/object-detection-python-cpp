@@ -29,6 +29,24 @@ set_target_properties(onnxruntime PROPERTIES
 
 find_package(OpenCV REQUIRED COMPONENTS core imgcodecs imgproc dnn)
 
+add_library(person_postprocessing STATIC
+    src/person_postprocessing.cpp
+)
+
+target_include_directories(person_postprocessing PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+)
+
+target_link_libraries(person_postprocessing PUBLIC
+    ${OpenCV_LIBS}
+)
+
+target_compile_options(person_postprocessing PRIVATE
+    -Wall
+    -Wextra
+    -Wpedantic
+)
+
 add_library(person_visualization STATIC
     common/src/person_visualization.cpp
 )
@@ -57,6 +75,7 @@ target_include_directories(person_detector PUBLIC
 
 target_link_libraries(person_detector PUBLIC
     onnxruntime
+    person_postprocessing
     ${OpenCV_LIBS}
 )
 
@@ -116,3 +135,26 @@ target_compile_options(verify_yolo11n_onnx PRIVATE
     -Wextra
     -Wpedantic
 )
+
+include(CTest)
+
+if(BUILD_TESTING)
+    add_executable(person_postprocessing_test
+        tests/person_postprocessing_test.cpp
+    )
+
+    target_link_libraries(person_postprocessing_test PRIVATE
+        person_postprocessing
+    )
+
+    target_compile_options(person_postprocessing_test PRIVATE
+        -Wall
+        -Wextra
+        -Wpedantic
+    )
+
+    add_test(
+        NAME person_postprocessing_test
+        COMMAND person_postprocessing_test
+    )
+endif()
